@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program — Day 1 | ISMCR 2026</title>
+<style>
+:root{--azul:#0b3d66;--azul-claro:#14538c;--dourado:#d4a017;--cinza:#f4f6f9;--texto:#2b2f36;--branco:#fff;--sombra:0 2px 8px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--texto);line-height:1.6;background:var(--branco)}
+img{max-width:100%;display:block}
+a{color:var(--azul-claro);text-decoration:none}
+a:hover{text-decoration:underline}
+/* Banner no topo */
+.banner{width:100%;height:auto;display:block}
+nav{position:sticky;top:0;z-index:50;background:var(--azul);box-shadow:var(--sombra);display:flex;align-items:center;flex-wrap:wrap;padding:0 1rem}
+nav .menu{flex:1 1 auto;display:flex;flex-wrap:wrap;justify-content:center;list-style:none;margin:0}
+nav .menu a{display:block;color:var(--branco);padding:.8rem .9rem;font-size:.9rem;font-weight:600}
+nav .menu a:hover{background:var(--azul-claro);text-decoration:none}
+nav .menu a.active{background:var(--azul-claro)}
+/* Botão de download do programa na barra de menu */
+.btn-download{flex-shrink:0;display:inline-flex;align-items:center;gap:.4rem;background:var(--dourado);color:var(--azul);font-weight:700;padding:.5rem 1.1rem;border-radius:999px;font-size:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.25);white-space:nowrap}
+.btn-download:hover{background:#e0b233;text-decoration:none}
+main{max-width:1000px;margin:0 auto;padding:2.5rem 1.2rem;min-height:60vh}
+section{margin-bottom:2.5rem;scroll-margin-top:70px}
+h2{color:var(--azul);font-size:1.4rem;border-bottom:3px solid var(--dourado);display:inline-block;padding-bottom:.3rem;margin-bottom:1.2rem}
+.card{background:var(--cinza);border-radius:12px;padding:1.2rem;box-shadow:var(--sombra)}
+.card p{text-align:justify;margin-bottom:.8rem}
+.card p:last-child{margin-bottom:0}
+.videos{display:grid;grid-template-columns:1fr;gap:1.2rem}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:var(--sombra)}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.nota{background:#fff8e6;border-left:4px solid var(--dourado);padding:.8rem 1rem;border-radius:8px;margin-bottom:1.2rem;font-size:.95rem}
+/* Tabela do programa */
+.tabela-programa{width:100%;border-collapse:collapse;background:var(--branco);border-radius:12px;overflow:hidden;box-shadow:var(--sombra)}
+.tabela-programa thead th{background:var(--azul);color:var(--branco);text-align:left;padding:.8rem 1rem;font-size:.95rem}
+.tabela-programa tbody td{border-bottom:1px solid #e3e8ee;padding:.9rem 1rem;vertical-align:top;font-size:.95rem}
+.tabela-programa tbody tr:last-child td{border-bottom:0}
+.tabela-programa .hora{font-weight:700;color:var(--azul);white-space:nowrap;background:var(--cinza);width:150px}
+.tabela-programa .sala-a{background:var(--branco)}
+.tabela-programa .sala-b{background:#fafbfd}
+.tabela-programa .pausa{background:#fff8e6;color:#5a6772;font-style:italic;text-align:center}
+.tabela-programa ul{margin:.4rem 0 0;padding-left:1.1rem}
+.tabela-programa ul li{margin-bottom:.3rem}
+.tabela-programa a{color:var(--azul-claro);font-weight:600}
+.tabela-programa small{color:#5a6772;font-weight:400}
+@media(max-width:600px){.tabela-programa .hora{width:auto;white-space:normal}}
+/* Linha do trabalho: título clicável à esquerda + botão abstract à direita */
+.paper-linha{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.paper-titulo{cursor:pointer;color:var(--azul-claro);font-weight:600}
+.paper-titulo:hover{text-decoration:underline}
+.btn-abstract{flex-shrink:0;background:none;border:1px solid var(--azul-claro);color:var(--azul-claro);border-radius:999px;padding:.25rem .8rem;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.btn-abstract:hover{background:var(--azul-claro);color:var(--branco)}
+@media(max-width:480px){.paper-linha{flex-direction:column;gap:.5rem}.btn-abstract{align-self:flex-start}}
+/* Janelas modais (keynotes, autores e abstracts) */
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.55);padding:1rem;overflow-y:auto}
+.modal.aberta{display:flex;align-items:flex-start;justify-content:center}
+.modal-conteudo{background:var(--branco);border-radius:12px;max-width:640px;width:100%;margin:2rem auto;padding:1.5rem;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal-conteudo h3{color:var(--azul);margin-bottom:.6rem}
+.modal-conteudo .fechar{float:right;background:none;border:0;font-size:1.6rem;line-height:1;color:#888;cursor:pointer}
+.modal-conteudo .fechar:hover{color:var(--azul)}
+/* Ficha do keynote */
+.ficha{display:flex;gap:1.2rem;align-items:flex-start;margin-top:.4rem}
+.ficha-foto{width:110px;height:110px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid var(--dourado)}
+.ficha-info .cargo{color:var(--azul-claro);font-weight:600;font-size:.95rem;margin-bottom:.4rem}
+.ficha-info p{text-align:justify;font-size:.95rem}
+/* Ficha de autores do trabalho */
+.autores{list-style:none;margin-top:.6rem}
+.autores li{background:var(--cinza);padding:.6rem .9rem;border-radius:8px;margin-bottom:.4rem;font-size:.95rem}
+.autores li:last-child{margin-bottom:0}
+.autores .nome{font-weight:600;color:var(--azul)}
+.autores .inst{color:var(--texto)}
+.autores .pais{color:var(--azul-claro);font-size:.85rem}
+/* Abstract */
+.abstract-texto{margin-top:.6rem;text-align:justify;font-size:.95rem}
+.abstract-texto p{margin-bottom:.6rem}
+.abstract-texto p:last-child{margin-bottom:0}
+.italia{background:linear-gradient(135deg,var(--azul),var(--azul-claro));color:var(--branco);border-radius:16px;padding:2rem 1.4rem;text-align:center}
+.italia h2{color:var(--branco);border-bottom-color:var(--dourado)}
+.italia p{margin-bottom:1.2rem;opacity:.95}
+.btn-grande{display:inline-block;background:var(--dourado);color:var(--azul);font-weight:700;padding:.8rem 1.8rem;border-radius:999px;font-size:1rem}
+.btn-grande:hover{background:#e0b233;text-decoration:none}
+.lista-nomes{list-style:none;display:grid;grid-template-columns:1fr;gap:.4rem}
+.lista-nomes li{background:var(--cinza);padding:.6rem .9rem;border-radius:8px;font-size:.95rem}
+.lista-nomes li::before{content:"🍽 "}
+footer{background:var(--azul);color:var(--branco);text-align:center;padding:1.5rem 1rem;font-size:.85rem;margin-top:2rem}
+footer a{color:var(--dourado)}
+@media(min-width:768px){
+  main{padding:3rem 1.5rem}
+  .videos{grid-template-columns:repeat(2,1fr)}
+  .lista-nomes{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .ficha{flex-direction:column;align-items:center;text-align:center}
+  .ficha-info p{text-align:center}
+}
+</style>
+</head>
+<body>
+<img class="banner" src="banner-ismcr2026.png" alt="ISMCR 2026">
+<nav>
+  <ul class="menu">
+    <li><a href="index.html">About</a></li>
+    <li><a href="day1.html" class="active">Day 1</a></li>
+    <li><a href="day2.html">Day 2</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="italy.html">Italy</a></li>
+  </ul>
+  <a class="btn-download" href="programa-ismcr2026.pdf" download>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Program
+  </a>
+</nav>
+<main>
+  <section>
+    <h2>Day 1 — Main Auditorium</h2>
+    <p class="nota">Click on a keynote to see the speaker's profile. Click on a paper title to see its authors, and use the Abstract button for the abstract. Technical sessions are detailed below.</p>
+    <table class="tabela-programa">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Activity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="hora">07:30–08:30</td><td>Registration</td></tr>
+        <tr><td class="hora">08:40–08:50</td><td>Opening Ceremony</td></tr>
+        <tr><td class="hora">08:50–09:50</td><td>Institutional Addresses (Universidade Estácio de Sá / Inmetro / Imeko)</td></tr>
+        <tr><td class="hora">09:50–10:30</td><td><a href="#" onclick="abrirModal('keynote-1');return false;"><strong>Keynote 1</strong> — From Apollo to Artemis, and Beyond: Human-rating certification</a></td></tr>
+        <tr><td class="hora">10:30–10:50</td><td class="pausa">Coffee Break</td></tr>
+        <tr><td class="hora">10:50–11:30</td><td><a href="#" onclick="abrirModal('keynote-2');return false;"><strong>Keynote 2</strong> — Wheel-Legged Robotics for Challenging Terrains</a></td></tr>
+        <tr><td class="hora">11:30–12:30</td><td><a href="#ts1"><strong>TS1 — Technical Session</strong> <small>(3 papers)</small></a></td></tr>
+        <tr><td class="hora">12:30–12:45</td><td>Official Hybrid Group Photo</td></tr>
+        <tr><td class="hora">12:45–14:00</td><td class="pausa">Lunch</td></tr>
+        <tr><td class="hora">14:00–14:40</td><td><a href="#" onclick="abrirModal('keynote-3');return false;"><strong>Keynote 3</strong> — Next Steps in the Robotic Exploration of Mars</a></td></tr>
+        <tr><td class="hora">14:40–15:20</td><td><a href="#ts2"><strong>TS2 — Technical Session</strong> (ON-LINE) <small>(2 papers)</small></a></td></tr>
+        <tr><td class="hora">15:20–16:00</td><td><a href="#" onclick="abrirModal('keynote-4');return false;"><strong>Keynote 4</strong> — Performance Assessment of Inertial Navigation Systems</a></td></tr>
+        <tr><td class="hora">16:00–16:20</td><td class="pausa">Coffee Break</td></tr>
+        <tr><td class="hora">16:20–17:20</td><td><a href="#ts3"><strong>TS3 — Technical Session</strong> <small>(3 papers)</small></a></td></tr>
+        <tr><td class="hora">19:00–22:00</td><td>Social Dinner — Windsor Marapendi</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="ts1">
+    <h2>TS1 — Technical Session</h2>
+    <p class="nota">11:30 – 12:30 · Main Auditorium</p>
+    <table class="tabela-programa">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Paper</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hora">11:30–11:50</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts1-1');return false;">Measurement-Driven Adaptive Control of Difficulty in Large-Scale Human-in-the-Loop Systems</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts1-1')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="hora">11:50–12:10</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts1-2');return false;">Validation of BeamNG.tech as a Digital Twin Platform for OBD-II Vehicle Data Acquisition toward Autonomous Systems Testing</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts1-2')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="hora">12:10–12:30</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts1-3');return false;">Flatness-Based Exact Linearization and Model Predictive Control for Collision-Free Navigation of Mobile Robots</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts1-3')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="ts2">
+    <h2>TS2 — Technical Session (ON-LINE)</h2>
+    <p class="nota">14:40 – 15:20 · Main Auditorium</p>
+    <table class="tabela-programa">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Paper</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hora">14:40–15:00</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts2-1');return false;">Design and Implementation of a Proof-of-Concept Excavating Rover Platform for Lunar Regolith Collection and Transportation</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts2-1')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="hora">15:00–15:20</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts2-2');return false;">A Lightweight Telemetry Platform for Measurement and Replay in Mobile Robotics</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts2-2')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="ts3">
+    <h2>TS3 — Technical Session</h2>
+    <p class="nota">16:20 – 17:20 · Main Auditorium</p>
+    <table class="tabela-programa">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Paper</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="hora">16:20–16:40</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts3-1');return false;">A Self-Healing Somatosensory Skin for Robotic Hands — Integrated Perception of Force, Temperature, and Nociception</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts3-1')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="hora">16:40–17:00</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts3-2');return false;">BehaviorEngine: Natural Language Rules for Humanoid Robots</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts3-2')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="hora">17:00–17:20</td>
+          <td>
+            <div class="paper-linha">
+              <a class="paper-titulo" onclick="abrirModal('paper-ts3-3');return false;">Traceable Visual Sensing for Subsea Robotic Inspection of Bell Mouths on Offshore Oil Platforms with Multicriteria Prioritization for Integrity Management</a>
+              <button class="btn-abstract" onclick="abrirModal('abs-ts3-3')">Abstract</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+<!-- ===== Modais dos Keynotes ===== -->
+<div class="modal" id="keynote-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('keynote-1')">&times;</button>
+    <h3>Keynote 1 — From Apollo to Artemis, and Beyond</h3>
+    <div class="ficha">
+      <img class="ficha-foto" src="[FOTO_KEYNOTE_1]" alt="George A. Salazar">
+      <div class="ficha-info">
+        <div class="cargo">George A. Salazar — NASA (retired) · Houston, USA</div>
+        <p>Former NASA engineer with a long career at NASA Johnson Space Center, focused on human spaceflight systems and human-rating certification — the central theme of this keynote on the journey from Apollo to Artemis and beyond.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="keynote-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('keynote-2')">&times;</button>
+    <h3>Keynote 2 — Wheel-Legged Robotics for Challenging Terrains</h3>
+    <div class="ficha">
+      <img class="ficha-foto" src="[FOTO_KEYNOTE_2]" alt="Marco Antonio Meggiolaro">
+      <div class="ficha-info">
+        <div class="cargo">Marco Antonio Meggiolaro — Pontifícia Universidade Católica (PUC-Rio) · Rio de Janeiro, Brazil</div>
+        <p>Professor at PUC-Rio and researcher in robotics, mechanical systems and control, with focus on wheel-legged locomotion for challenging terrains.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="keynote-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('keynote-3')">&times;</button>
+    <h3>Keynote 3 — Next Steps in the Robotic Exploration of Mars</h3>
+    <div class="ficha">
+      <img class="ficha-foto" src="[FOTO_KEYNOTE_3]" alt="Ivair Gontijo">
+      <div class="ficha-info">
+        <div class="cargo">Ivair Gontijo — NASA/JPL (retired) · Pasadena, CA, USA</div>
+        <p>Retired engineer from NASA's Jet Propulsion Laboratory (JPL), with extensive experience in deep-space missions and the robotic exploration of Mars.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="keynote-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('keynote-4')">&times;</button>
+    <h3>Keynote 4 — Performance Assessment of Inertial Navigation Systems</h3>
+    <div class="ficha">
+      <img class="ficha-foto" src="[FOTO_KEYNOTE_4]" alt="Waldemar de Castro Leite Filho">
+      <div class="ficha-info">
+        <div class="cargo">Waldemar de Castro Leite Filho — CLC Consultoria · São José dos Campos, Brazil</div>
+        <p>Aerospace engineer and consultant at CLC Consultoria, with a long track record in guidance, navigation and control, including inertial navigation systems.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos TS1: autores ===== -->
+<div class="modal" id="paper-ts1-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts1-1')">&times;</button>
+    <h3>Measurement-Driven Adaptive Control of Difficulty in Large-Scale Human-in-the-Loop Systems</h3>
+    <ul class="autores">
+      <li><span class="nome">Gurgel Filho, G.; Lemos de Oliveira, M.; Murilo de Gouvêa, F.; Abreu Borges, A.; Cordeiro Soares, W.</span><br><span class="inst">Universidade Estácio de Sá</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="paper-ts1-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts1-2')">&times;</button>
+    <h3>Validation of BeamNG.tech as a Digital Twin Platform for OBD-II Vehicle Data Acquisition toward Autonomous Systems Testing</h3>
+    <ul class="autores">
+      <li><span class="nome">Nascimento, P.; Borba, E.; Gomes, R.; Valente, E.; Melo Jr., W.</span><br><span class="inst">Instituto Nacional de Metrologia e Qualidade (Inmetro)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="paper-ts1-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts1-3')">&times;</button>
+    <h3>Flatness-Based Exact Linearization and Model Predictive Control for Collision-Free Navigation of Mobile Robots</h3>
+    <ul class="autores">
+      <li><span class="nome">Gyenes, Z.; Finta, B.; Kiss, B.; Gincsainé Szádeczky-Kardoss, E.</span><br><span class="inst">Budapest University of Technology and Economics</span><br><span class="pais">Budapest, Hungary</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos TS2: autores ===== -->
+<div class="modal" id="paper-ts2-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts2-1')">&times;</button>
+    <h3>Design and Implementation of a Proof-of-Concept Excavating Rover Platform for Lunar Regolith Collection and Transportation</h3>
+    <ul class="autores">
+      <li><span class="nome">Nguyen, L.; Garcia, M.</span><br><span class="inst">University of Houston-Clear Lake</span><br><span class="pais">Houston, TX, USA</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="paper-ts2-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts2-2')">&times;</button>
+    <h3>A Lightweight Telemetry Platform for Measurement and Replay in Mobile Robotics</h3>
+    <ul class="autores">
+      <li><span class="nome">Chagas, F.; Simic, V.</span><br><span class="inst">Norwegian University of Science and Technology</span><br><span class="pais">Trondheim, Norway</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos TS3: autores ===== -->
+<div class="modal" id="paper-ts3-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts3-1')">&times;</button>
+    <h3>A Self-Healing Somatosensory Skin for Robotic Hands — Integrated Perception of Force, Temperature, and Nociception</h3>
+    <ul class="autores">
+      <li><span class="nome">Kato, F.; Zhou, Z.; Zhao, J.; Jo, H.; Nagahama, S.; Akiyama, Y.; Iwata, H.; Sugano, S.</span><br><span class="inst">Future Robotics Organization, Waseda University</span><br><span class="pais">Tokyo, Japan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="paper-ts3-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts3-2')">&times;</button>
+    <h3>BehaviorEngine: Natural Language Rules for Humanoid Robots</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza, V.; Sá, H.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="paper-ts3-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('paper-ts3-3')">&times;</button>
+    <h3>Traceable Visual Sensing for Subsea Robotic Inspection of Bell Mouths on Offshore Oil Platforms with Multicriteria Prioritization for Integrity Management</h3>
+    <ul class="autores">
+      <li><span class="nome">Pereira, R.; Dos Santos, M.</span><br><span class="inst">Universidade Federal Fluminense (UFF) · Petrobras</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts ===== -->
+<div class="modal" id="abs-ts1-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts1-1')">&times;</button>
+    <h3>Abstract — Measurement-Driven Adaptive Control of Difficulty in Large-Scale Human-in-the-Loop Systems</h3>
+    <div class="abstract-texto">
+      <p>Large-scale higher-education assessment systems can be interpreted as human-in-the-loop adaptive environments in which assessment conditions, accumulated learner histories, and population-level responses interact over recurrent cycles. This work proposes a Learning Metrology framework based on an excitation–state–response interpretation. Expected Score (NE) represents the assessment excitation, accumulated GAp (Grau de Aprendizagem; Learning Degree) represents historical learner-state information, and TIVA (Taxa de Insucesso em Verificações de Aprendizagem; Failure Rate in Learning Assessment) represents the collective response. The study analyzes approximately 82,000 controlled in-person assessment observations across 38 undergraduate disciplines. Linear, exponential, and logistic formulations are compared. Although the weighted linear model yields slightly lower residual errors, the logistic excitation–state model provides bounded-response consistency and supports inverse interpretation. Results show that NE is a stable excitation-related variable, whereas accumulated GAp exhibits subgroup-dependent behavior. The main contribution is an inverse logistic formulation that estimates Expected Score target ranges for assessment-mask selection under parameter uncertainty. The framework supports longitudinal state interpretation and adaptive difficulty regulation in large-scale human-in-the-loop assessment systems.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts1-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts1-2')">&times;</button>
+    <h3>Abstract — Validation of BeamNG.tech as a Digital Twin Platform for OBD-II Vehicle Data Acquisition toward Autonomous Systems Testing</h3>
+    <div class="abstract-texto">
+      <p>The growing demand for vehicle data in energy efficiency, dynamic behavior, and autonomous systems research makes digital twins a promising alternative to costly and difficult-to-repeat field measurements. This paper validates BeamNG.tech as a digital twin platform by comparing simulated data against real OBD-II telemetry from a vehicle driven on a digitally reconstructed Inmetro campus track. Results show high spatial fidelity, with Pearson and Spearman correlation coefficients above 0.999 between real and simulated cumulative distance profiles across two routes. However, comparison with three real drivers revealed only moderate correlation for velocity and a more pronounced divergence in throttle input and engine rotation, as the AI traffic agent applies brief high-magnitude throttle peaks rather than the continuous corrections typical of human drivers; varying the agent's aggressiveness parameter did not change this behavior. These findings support BeamNG.tech as a promising candidate for a digital twin platform, representing a preliminary validation step rather than a fully mature digital twin implementation. Once fully validated, this platform opens pathways for future applications such as sensor fusion evaluation, autonomous driving benchmarking, and large-scale synthetic data generation, in a controlled, repeatable, and cost-effective virtual environment.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts1-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts1-3')">&times;</button>
+    <h3>Abstract — Flatness-Based Exact Linearization and Model Predictive Control for Collision-Free Navigation of Mobile Robots</h3>
+    <div class="abstract-texto">
+      <p>Trajectory planning and tracking for mobile robots in uncertain environments with static and dynamic obstacles remains a challenging problem, requiring both sensing of obstacles and prediction of their future motion. This paper proposes a novel algorithm, LAPOS (Linearization and Predictive Obstacle-aware Steering), a real-time motion planning method that fuses exact linearization with a model predictive control (MPC) architecture for safe navigation in dynamic environments. Since the kinematic models of mobile robots are nonlinear and nonholonomic, direct application of MPC is difficult; instead, an exact linearizing inner loop reduces the problem to an equivalent linear one in which acceleration is the control input. The framework is developed in a unified manner and applied to car-like, differential-drive, and omnidirectional robots, and the algorithm is comparatively evaluated across these platforms. Simulation results demonstrate the effectiveness and real-time applicability of LAPOS for safe navigation in dynamic scenarios.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts2-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts2-1')">&times;</button>
+    <h3>Abstract — Design and Implementation of a Proof-of-Concept Excavating Rover Platform for Lunar Regolith Collection and Transportation</h3>
+    <div class="abstract-texto">
+      <p>This paper presents the design, implementation, and preliminary functional verification of a proof-of-concept excavating rover platform developed as a terrestrial testbed for future lunar regolith collection and transportation research. The platform integrates a four-wheel differential-drive mobility system with additively manufactured grouser wheels, a conveyor-based excavation mechanism, a rear disposal bucket, an NVIDIA Jetson Orin NX, an ESP32 microcontroller, ROS 2, micro-ROS, LiDAR, and camera sensing. The architecture separates high-level computing from low-level actuation and intentionally avoids reliance on wheel-encoder odometry because severe slip is expected on loose granular terrain. A physical prototype was fabricated and integrated. Preliminary testing verified manual forward and reverse motion, turning, conveyor operation, disposal-bucket actuation, ROS 2 and micro-ROS communication, sensor integration, and wireless teleoperation. The prototype is not presented as a lunar-qualified rover: autonomous excavation, quantitative lunar-analog performance, and environmental qualification remain future work. Instead, the contribution is an integrated physical research platform that exposes practical system-level issues and provides a basis for controlled regolith-simulant testing and progressive development of autonomous navigation and excavation capabilities.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts2-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts2-2')">&times;</button>
+    <h3>Abstract — A Lightweight Telemetry Platform for Measurement and Replay in Mobile Robotics</h3>
+    <div class="abstract-texto">
+      <p>Robotic supervision and downstream fusion depend on telemetry pipelines that convert heterogeneous sensor streams into persistent, replayable, and interface-ready state records. Yet these pipelines are often treated as implementation infrastructure rather than as observable components of the robotic measurement chain. This paper presents a lightweight telemetry platform for measurement and replay in mobile robotics. The platform combines a multi-rate robot simulator, Message Queuing Telemetry Transport (MQTT) publish/subscribe transport, compact raw binary sensor topics, a consolidated Protocol Buffers TelemetryState snapshot, SQLite persistence in write-ahead logging mode, and a WebSocket interface for live monitoring and database-backed replay. The gateway timestamps each snapshot at reception, decouples ingestion from disk input/output (I/O) through a First-In-First-Out (FIFO) queue, stores snapshots in configurable SQLite batches, and serves the same stored records to browser clients for replay. To validate the platform rather than benchmark middleware broadly, we ran a local gateway-side evaluation with five repeated 60 s runs for each combination of snapshot rate (20, 50, 100, and 200 Hz) and SQLite batch size (1 and 50 rows/transaction), plus two 10 min runs at 200 Hz. Across the repeated runs, aggregate reception and database insertion rates remained matched for approximately 146 B snapshots; mean commit times stayed below 0.102 ms, and the 99th-percentile (p99) interval-averaged commit time remained below 0.386 ms. The 10 min 200 Hz runs stored 120000 rows each with matched reception and insertion rates of 199.66 msg/s. The results support the platform as an inspectable local testbed for telemetry reliability, replay, and future user interface-evaluation protocols.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts3-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts3-1')">&times;</button>
+    <h3>Abstract — A Self-Healing Somatosensory Skin for Robotic Hands — Integrated Perception of Force, Temperature, and Nociception</h3>
+    <div class="abstract-texto">
+      <p>This paper proposes a novel somatosensory skin sensor for robotic hands that features a multi-modal perception system and a thermally stimulated self-healing capability. Inspired by the physiological framework of haptic primary colors, the proposed system integrates cutaneous perception for force and temperature, alongside structural damage sensing as an engineering analogue of nociception (pain sensation), within a unified vision-based sensor configuration. The sensor features a chemically synthesized poly(N-acryloyl-nipecotamide) hydrogel embedded with a 3×3 matrix of metal force markers and four surrounding rows of thermochromic temperature markers, mounted on a custom robotic finger prototype. To classify structural damage (incised wounds, abrasions, and undamaged states) under complex sensor backgrounds, a custom five-layer CNN baseline model was developed and initially evaluated using a surrogate transparent urethane gel dataset, achieving a classification accuracy of 92% and outperforming overfitted pre-trained networks. Furthermore, a sensor-specific data augmentation strategy was evaluated; real-time damage detection was successfully demonstrated on the actual marker-embedded self-healing hydrogel integrated into the robotic finger prototype. Finally, a real-time semantic segmentation pipeline utilizing DeepLabV3 Mobile was implemented to calculate the physical surface area of structural damage (IoU = 99.3%, 30 fps), successfully quantifying nociceptive stimulus magnitude. Experimental results demonstrate the feasibility of multi-modal somatosensory integration and real-time damage monitoring, serving as a foundational step toward self-preserving robotic manipulation.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts3-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts3-2')">&times;</button>
+    <h3>Abstract — BehaviorEngine: Natural Language Rules for Humanoid Robots</h3>
+    <div class="abstract-texto">
+      <p>This paper presents BehaviorEngine, a lightweight framework for reactive programming of humanoid robots through rules expressed in natural language, eliminating the need for explicit coding of perception loops, distance conditionals, and temporal control of action triggering. The framework was implemented on the Unitree G1 EDU humanoid robot, integrating YOLO-based object detection, RealSense camera depth estimation aligned to the RGB stream, and arm and locomotion action execution via the Unitree SDK2. A regular expression based interpreter maps sentences of the form "action if class operator distance" to robot method calls, with automatic control of the refractory period between triggers. To evaluate the framework's impact on programming effort, ten human-robot social interaction scenarios were implemented in two ways: with Python code directly against the underlying libraries, and with BehaviorEngine. The implementations were compared in terms of total and logical lines of code, number of conditional branches, McCabe cyclomatic complexity at the function and module level, and number of manual configuration units. The results indicate an average reduction of 84.1% in total lines of code, 88.1% in logical lines of code, and complete elimination of conditional branches and function-level cyclomatic complexity in user application scripts, shifting this complexity into the framework, where it is handled once. The implications of these results are discussed for the accessibility of humanoid robot programming to non-expert users and for the reduction of implementation errors in social interaction scenarios.</p>
+    </div>
+  </div>
+</div>
+<div class="modal" id="abs-ts3-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('abs-ts3-3')">&times;</button>
+    <h3>Abstract — Traceable Visual Sensing for Subsea Robotic Inspection of Bell Mouths on Offshore Oil Platforms with Multicriteria Prioritization for Integrity Management</h3>
+    <div class="abstract-texto">
+      <p>Subsea robotic inspection of critical offshore components depends not only on remote image acquisition, but also on the ability to qualify visual evidence and propagate it in a traceable manner toward operational decision-making. In the case of bell mouths, variations in lighting, framing, occlusion, and stability of the Remotely Operated Vehicle (ROV) affect the reliability of observation and, consequently, the prioritization of inspection activities. This paper presents a traceable visual sensing system for subsea robotic inspection, in which visual evidence acquired by ROV is subjected to curation, visual-quality assessment, perceptual processing, and conversion into technical criteria for multicriteria decision support using THOR 2. The study establishes a replicable protocol for data acquisition, image traceability, quantitative evaluation of the perception module, modeling of the technical criteria C₁, C₂, and C₃, elicitation of the managerial criteria C₄ and C₅, and robustness analysis of the final ranking. As a case study, the system was applied to four BSN 300 bell mouths of an offshore unit, producing a structured prioritization ranking. The contribution of the work lies in integrating robotic inspection, qualification of visual evidence, and operational decision-making into a single auditable chain, with explicit documentation of the assumptions and limitations of the study.</p>
+    </div>
+  </div>
+</div>
+<footer>
+  <p>© ISMCR 2026 — International Symposium on Measurement and Control in Robotics — <a href="https://www.ismcr.org">www.ismcr.org</a></p>
+</footer>
+<script>
+  function abrirModal(id){document.getElementById(id).classList.add('aberta')}
+  function fecharModal(id){document.getElementById(id).classList.remove('aberta')}
+  document.querySelectorAll('.modal').forEach(function(m){
+    m.addEventListener('click', function(e){
+      if(e.target === m){m.classList.remove('aberta')}
+    });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.modal.aberta').forEach(function(m){m.classList.remove('aberta')});
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISMCR — International Congress 2027, Italy</title>
+<style>
+:root{--azul:#0b3d66;--azul-claro:#14538c;--dourado:#d4a017;--cinza:#f4f6f9;--texto:#2b2f36;--branco:#fff;--sombra:0 2px 8px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--texto);line-height:1.6;background:var(--branco)}
+img{max-width:100%;display:block}
+a{color:var(--azul-claro);text-decoration:none}
+a:hover{text-decoration:underline}
+/* Banner no topo */
+.banner{width:100%;height:auto;display:block}
+nav{position:sticky;top:0;z-index:50;background:var(--azul);box-shadow:var(--sombra);display:flex;align-items:center;flex-wrap:wrap;padding:0 1rem}
+nav .menu{max-width:1000px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;list-style:none;flex:1 1 auto}
+nav .menu a{display:block;color:var(--branco);padding:.8rem .9rem;font-size:.9rem;font-weight:600}
+nav .menu a:hover{background:var(--azul-claro);text-decoration:none}
+nav .menu a.active{background:var(--azul-claro)}
+/* Botão de download do programa na barra de menu */
+.btn-download{flex-shrink:0;display:inline-flex;align-items:center;gap:.4rem;background:var(--dourado);color:var(--azul);font-weight:700;padding:.5rem 1.1rem;border-radius:999px;font-size:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.25);white-space:nowrap}
+.btn-download:hover{background:#e0b233;text-decoration:none}
+main{max-width:1000px;margin:0 auto;padding:2.5rem 1.2rem;min-height:60vh}
+section{margin-bottom:2.5rem}
+h2{color:var(--azul);font-size:1.4rem;border-bottom:3px solid var(--dourado);display:inline-block;padding-bottom:.3rem;margin-bottom:1.2rem}
+.card{background:var(--cinza);border-radius:12px;padding:1.2rem;box-shadow:var(--sombra)}
+.card p{text-align:justify;margin-bottom:.8rem}
+.card p:last-child{margin-bottom:0}
+.videos{display:grid;grid-template-columns:1fr;gap:1.2rem}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:var(--sombra)}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.nota{background:#fff8e6;border-left:4px solid var(--dourado);padding:.8rem 1rem;border-radius:8px;margin-bottom:1.2rem;font-size:.95rem}
+/* Tabela do programa */
+.tabela-programa{width:100%;border-collapse:collapse;background:var(--branco);border-radius:12px;overflow:hidden;box-shadow:var(--sombra)}
+.tabela-programa thead th{background:var(--azul);color:var(--branco);text-align:left;padding:.8rem 1rem;font-size:.95rem}
+.tabela-programa tbody td{border-bottom:1px solid #e3e8ee;padding:.9rem 1rem;vertical-align:top;font-size:.95rem}
+.tabela-programa tbody tr:last-child td{border-bottom:0}
+.tabela-programa .hora{font-weight:700;color:var(--azul);white-space:nowrap;background:var(--cinza);width:150px}
+.tabela-programa .sala-a{background:var(--branco)}
+.tabela-programa .sala-b{background:#fafbfd}
+.tabela-programa .pausa{background:#fff8e6;color:#5a6772;font-style:italic;text-align:center}
+.tabela-programa ul{margin:.4rem 0 0;padding-left:1.1rem}
+.tabela-programa ul li{margin-bottom:.3rem}
+.tabela-programa a{color:var(--azul-claro);font-weight:600}
+.tabela-programa small{color:#5a6772;font-weight:400}
+@media(max-width:600px){.tabela-programa .hora{width:auto;white-space:normal}}
+/* Janelas modais (abstracts) */
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.55);padding:1rem;overflow-y:auto}
+.modal.aberta{display:flex;align-items:flex-start;justify-content:center}
+.modal-conteudo{background:var(--branco);border-radius:12px;max-width:640px;width:100%;margin:2rem auto;padding:1.5rem;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal-conteudo h3{color:var(--azul);margin-bottom:.6rem}
+.modal-conteudo .fechar{float:right;background:none;border:0;font-size:1.6rem;line-height:1;color:#888;cursor:pointer}
+.modal-conteudo .fechar:hover{color:var(--azul)}
+/* Ficha do keynote */
+.ficha{display:flex;gap:1.2rem;align-items:flex-start;margin-top:.4rem}
+.ficha-foto{width:110px;height:110px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid var(--dourado)}
+.ficha-info .cargo{color:var(--azul-claro);font-weight:600;font-size:.95rem;margin-bottom:.4rem}
+.ficha-info p{text-align:justify;font-size:.95rem}
+.italia{background:linear-gradient(135deg,var(--azul),var(--azul-claro));color:var(--branco);border-radius:16px;padding:2rem 1.4rem;text-align:center}
+.italia h2{color:var(--branco);border-bottom-color:var(--dourado)}
+.italia p{margin-bottom:1.2rem;opacity:.95}
+.btn-grande{display:inline-block;background:var(--dourado);color:var(--azul);font-weight:700;padding:.8rem 1.8rem;border-radius:999px;font-size:1rem}
+.btn-grande:hover{background:#e0b233;text-decoration:none}
+.lista-nomes{list-style:none;display:grid;grid-template-columns:1fr;gap:.4rem}
+.lista-nomes li{background:var(--cinza);padding:.6rem .9rem;border-radius:8px;font-size:.95rem}
+.lista-nomes li::before{content:"🍽 "}
+footer{background:var(--azul);color:var(--branco);text-align:center;padding:1.5rem 1rem;font-size:.85rem;margin-top:2rem}
+footer a{color:var(--dourado)}
+@media(min-width:768px){
+  main{padding:3rem 1.5rem}
+  .videos{grid-template-columns:repeat(2,1fr)}
+  .lista-nomes{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .ficha{flex-direction:column;align-items:center;text-align:center}
+  .ficha-info p{text-align:center}
+}
+</style>
+</head>
+<body>
+<img class="banner" src="banner-ismcr2026.png" alt="ISMCR 2026">
+<nav>
+  <ul class="menu">
+    <li><a href="index.html">About</a></li>
+    <li><a href="day1.html">Day 1</a></li>
+    <li><a href="day2.html">Day 2</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="italy.html" class="active">Italy</a></li>
+  </ul>
+  <a class="btn-download" href="programa-ismcr2026.pdf" download>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Program
+  </a>
+</nav>
+<main>
+  <section>
+    <div class="italia">
+      <h2>XXV IMEKO World Congress — Italy</h2>
+      <p>The next congress will take place in <strong>Rimini, Italy</strong> in <strong>August 30 - September 3, 2027</strong>.</p>
+      <p>Stay tuned for registration and submission deadlines!</p>
+      <a class="btn-grande" href="https://www.imeko.org" target="_blank" rel="noopener">🌍 Visit the official website</a>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>© ISMCR 2026 — International Symposium on Measurement and Control in Robotics — <a href="https://www.ismcr.org">www.ismcr.org</a></p>
+</footer>
+</body>
+</html>

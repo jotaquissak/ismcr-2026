@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Program — Day 2 | ISMCR 2026</title>
+<style>
+:root{--azul:#0b3d66;--azul-claro:#14538c;--dourado:#d4a017;--cinza:#f4f6f9;--texto:#2b2f36;--branco:#fff;--sombra:0 2px 8px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--texto);line-height:1.6;background:var(--branco)}
+img{max-width:100%;display:block}
+a{color:var(--azul-claro);text-decoration:none}
+a:hover{text-decoration:underline}
+/* Banner no topo */
+.banner{width:100%;height:auto;display:block}
+nav{position:sticky;top:0;z-index:50;background:var(--azul);box-shadow:var(--sombra);display:flex;align-items:center;flex-wrap:wrap;padding:0 1rem}
+nav .menu{max-width:1000px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;list-style:none;flex:1 1 auto}
+.btn-download{flex-shrink:0;display:inline-flex;align-items:center;gap:.4rem;background:var(--dourado);color:var(--azul);font-weight:700;padding:.5rem 1.1rem;border-radius:999px;font-size:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.25);white-space:nowrap}
+.btn-download:hover{background:#e0b233;text-decoration:none}
+nav .menu{max-width:1000px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;list-style:none}
+nav .menu a{display:block;color:var(--branco);padding:.8rem .9rem;font-size:.9rem;font-weight:600}
+nav .menu a:hover{background:var(--azul-claro);text-decoration:none}
+nav .menu a.active{background:var(--azul-claro)}
+main{max-width:1000px;margin:0 auto;padding:2.5rem 1.2rem;min-height:60vh}
+section{margin-bottom:2.5rem}
+h2{color:var(--azul);font-size:1.4rem;border-bottom:3px solid var(--dourado);display:inline-block;padding-bottom:.3rem;margin-bottom:1.2rem}
+.card{background:var(--cinza);border-radius:12px;padding:1.2rem;box-shadow:var(--sombra)}
+.card p{text-align:justify;margin-bottom:.8rem}
+.card p:last-child{margin-bottom:0}
+.videos{display:grid;grid-template-columns:1fr;gap:1.2rem}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;box-shadow:var(--sombra)}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.nota{background:#fff8e6;border-left:4px solid var(--dourado);padding:.8rem 1rem;border-radius:8px;margin-bottom:1.2rem;font-size:.95rem}
+/* Tabela do programa */
+.tabela-programa{width:100%;border-collapse:collapse;background:var(--branco);border-radius:12px;overflow:hidden;box-shadow:var(--sombra)}
+.tabela-programa thead th{background:var(--azul);color:var(--branco);text-align:left;padding:.8rem 1rem;font-size:.95rem}
+.tabela-programa tbody td{border-bottom:1px solid #e3e8ee;padding:.9rem 1rem;vertical-align:top;font-size:.95rem}
+.tabela-programa tbody tr:last-child td{border-bottom:0}
+.tabela-programa .hora{font-weight:700;color:var(--azul);white-space:nowrap;background:var(--cinza);width:150px}
+.tabela-programa .sala-a{background:var(--branco)}
+.tabela-programa .sala-b{background:#fafbfd}
+.tabela-programa .pausa{background:#fff8e6;color:#5a6772;font-style:italic;text-align:center}
+.tabela-programa ul{margin:.4rem 0 0;padding-left:1.1rem}
+.tabela-programa ul li{margin-bottom:.3rem}
+.tabela-programa a{color:var(--azul-claro);font-weight:600}
+.tabela-programa small{color:#5a6772;font-weight:400}
+@media(max-width:600px){.tabela-programa .hora{width:auto;white-space:normal}}
+/* Abas dos auditórios */
+.abas{display:flex;gap:.4rem;margin-bottom:1.4rem;border-bottom:2px solid var(--cinza);flex-wrap:wrap}
+.aba{padding:.7rem 1.2rem;font-size:.95rem;font-weight:600;color:var(--azul-claro);background:var(--cinza);border:0;border-radius:10px 10px 0 0;cursor:pointer;transition:background .15s,color .15s}
+.aba:hover{background:#e6ebf1}
+.aba.ativa{background:var(--azul);color:var(--branco)}
+.aba small{display:block;font-weight:400;font-size:.75rem;opacity:.85}
+.painel{display:none}
+.painel.ativa{display:block}
+/* Linha do trabalho: título clicável à esquerda + botão abstract à direita */
+.paper-linha{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.paper-titulo{cursor:pointer;color:var(--azul-claro);font-weight:600}
+.paper-titulo:hover{text-decoration:underline}
+.btn-abstract{flex-shrink:0;background:none;border:1px solid var(--azul-claro);color:var(--azul-claro);border-radius:999px;padding:.25rem .8rem;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.btn-abstract:hover{background:var(--azul-claro);color:var(--branco)}
+@media(max-width:480px){.paper-linha{flex-direction:column;gap:.5rem}.btn-abstract{align-self:flex-start}}
+/* Janelas modais (autores e abstracts) */
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.55);padding:1rem;overflow-y:auto}
+.modal.aberta{display:flex;align-items:flex-start;justify-content:center}
+.modal-conteudo{background:var(--branco);border-radius:12px;max-width:640px;width:100%;margin:2rem auto;padding:1.5rem;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal-conteudo h3{color:var(--azul);margin-bottom:.6rem}
+.modal-conteudo .fechar{float:right;background:none;border:0;font-size:1.6rem;line-height:1;color:#888;cursor:pointer}
+.modal-conteudo .fechar:hover{color:var(--azul)}
+/* Ficha de autores do trabalho */
+.autores{list-style:none;margin-top:.6rem}
+.autores li{background:var(--cinza);padding:.6rem .9rem;border-radius:8px;margin-bottom:.4rem;font-size:.95rem}
+.autores li:last-child{margin-bottom:0}
+.autores .nome{font-weight:600;color:var(--azul)}
+.autores .inst{color:var(--texto)}
+.autores .pais{color:var(--azul-claro);font-size:.85rem}
+/* Abstract */
+.abstract-texto{margin-top:.6rem;text-align:justify;font-size:.95rem}
+.abstract-texto p{margin-bottom:.6rem}
+.abstract-texto p:last-child{margin-bottom:0}
+.italia{background:linear-gradient(135deg,var(--azul),var(--azul-claro));color:var(--branco);border-radius:16px;padding:2rem 1.4rem;text-align:center}
+.italia h2{color:var(--branco);border-bottom-color:var(--dourado)}
+.italia p{margin-bottom:1.2rem;opacity:.95}
+.btn-grande{display:inline-block;background:var(--dourado);color:var(--azul);font-weight:700;padding:.8rem 1.8rem;border-radius:999px;font-size:1rem}
+.btn-grande:hover{background:#e0b233;text-decoration:none}
+.lista-nomes{list-style:none;display:grid;grid-template-columns:1fr;gap:.4rem}
+.lista-nomes li{background:var(--cinza);padding:.6rem .9rem;border-radius:8px;font-size:.95rem}
+.lista-nomes li::before{content:"🍽 "}
+footer{background:var(--azul);color:var(--branco);text-align:center;padding:1.5rem 1rem;font-size:.85rem;margin-top:2rem}
+footer a{color:var(--dourado)}
+@media(min-width:768px){
+  main{padding:3rem 1.5rem}
+  .videos{grid-template-columns:repeat(2,1fr)}
+  .lista-nomes{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<img class="banner" src="banner-ismcr2026.png" alt="ISMCR 2026">
+<nav>
+  <ul class="menu">
+    <li><a href="index.html">About</a></li>
+    <li><a href="day1.html">Day 1</a></li>
+    <li><a href="day2.html" class="active">Day 2</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="italy.html">Italy</a></li>
+  </ul>
+<a class="btn-download" href="programa-ismcr2026.pdf" download>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  Program
+</a>
+</nav>
+<main>
+  <h2>Day 2 — Program</h2>
+  <p class="nota">The event on Day 2 runs in two auditoriums. Select a tab to view each schedule. Click on a paper title to see its authors, and use the Abstract button for the abstract.</p>
+  <div class="abas">
+    <button class="aba ativa" data-aba="main">Main Auditorium <small>on site</small></button>
+    <button class="aba" data-aba="mini">Mini Auditorium <small>on-line</small></button>
+  </div>
+  <!-- ===== Painel Main Auditorium (on site) ===== -->
+  <div class="painel ativa" id="painel-main">
+    <section>
+      <h2>Day 2 — Main Auditorium</h2>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Activity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="hora">07:30–08:00</td><td>Registration Desk Opening &amp; Welcome Coffee</td></tr>
+          <tr><td class="hora">08:00–09:40</td><td><a href="#ts5"><strong>TS5 — Onsite Session</strong></a></td></tr>
+          <tr><td class="hora">09:40–10:00</td><td class="pausa">Coffee Break</td></tr>
+          <tr><td class="hora">10:00–11:40</td><td><a href="#ts7"><strong>TS7 — Onsite Session</strong></a></td></tr>
+          <tr><td class="hora">12:00–13:00</td><td class="pausa">Lunch</td></tr>
+          <tr><td class="hora">13:00–14:40</td><td><a href="#ts9"><strong>TS9 — Onsite Session</strong></a></td></tr>
+          <tr><td class="hora">14:40–15:00</td><td class="pausa">Coffee Break</td></tr>
+          <tr><td class="hora">15:00–17:00</td><td><a href="#ts11"><strong>TS11 — Onsite Session</strong></a></td></tr>
+          <tr><td class="hora">17:00</td><td>Technical Closing Ceremony — Main Auditorium</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts5">
+      <h2>TS5 — Onsite Session</h2>
+      <p class="nota">08:00 – 09:40 · Main Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">08:00–08:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts5-1');return false;">VR and Robotic Rehabilitation: Results of a Systematic Review Following PRISMA Guidelines</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts5-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">08:20–08:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts5-2');return false;">Iterated Invariant EKF for 3D Landmark-Aided Inertial Navigation</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts5-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">08:40–09:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts5-3');return false;">Perimeter Defense Game with Obstacles</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts5-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">09:00–09:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts5-4');return false;">Covert System Identification Under Timing Constraints: A Static Linear Model and Its Detectability Implications</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts5-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">09:20–09:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts5-5');return false;">EmbodiedAI: A Hardware Abstraction Layer for the Unitree G1 EDU</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts5-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts7">
+      <h2>TS7 — Onsite Session</h2>
+      <p class="nota">10:00 – 11:40 · Main Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">10:00–10:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts7-1');return false;">ResNet+IMU Sensor Fusion for Frame-to-Frame Visual-Inertial Translation Estimation in UAVs</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts7-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">10:20–10:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts7-2');return false;">Measurement-Driven Evaluation of Physics-Informed Multi-Agent Reinforcement Learning</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts7-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">10:40–11:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts7-3');return false;">A Reproducible 3D-Printed Robotic Fixture with Potentiometric Feedback and Vision-Based Readout for Handheld Multimeter Calibration</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts7-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">11:00–11:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts7-4');return false;">Experimental Evaluation of UAV-Based Multimodal Imaging System for Produced Water Detection in Offshore Environments</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts7-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">11:20–11:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts7-5');return false;">BMS-Based Arm Energy Characterization of the Unitree G1 EDU</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts7-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts9">
+      <h2>TS9 — Onsite Session</h2>
+      <p class="nota">13:00 – 14:40 · Main Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">13:00–13:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts9-1');return false;">Development of a Portable Process Multicalibrator for Measurement and Signal Simulation with BLE Connectivity for Metrological Automation</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts9-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">13:20–13:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts9-2');return false;">Trustworthy Intelligent Measurement for Industrial Weighing: A Context-Aware Framework for Reliability, Auditability, and Metrological Traceability</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts9-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">13:40–14:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts9-3');return false;">Dynamic Timed Elastic Band Based Trajectory Planning for Car-Like Mobile Robots</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts9-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">14:00–14:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts9-4');return false;">Pedestrian Multi-HMD with Relative Pose Estimation Using Interactive QR Codes: Using GNSS and VPS Data Encoded in Real-Time in QR Codes</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts9-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">14:20–14:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts9-5');return false;">Temporal Characterization of IMU and LiDAR Data in the Unitree G1 EDU</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts9-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts11">
+      <h2>TS11 — Onsite Session</h2>
+      <p class="nota">15:00 – 17:00 · Main Auditorium · 6 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">15:00–15:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-1');return false;">Efficient RGB-IR Fusion for UAV Object Detection with Mamba-2</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">15:20–15:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-2');return false;">Comparative Evaluation of Low-Cost Sensing and Mapping Solutions for Teleoperated Ground Robots in USAR</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">15:40–16:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-3');return false;">Distributed Observer Design for Multi-Agent Systems with Time-Varying Communication Delays: A Lyapunov-Krasovskii Approach</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:00–16:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-4');return false;">YOLO Benchmarking for Obstacle Detection on Unitree G1</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:20–16:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-5');return false;">Measurement-Oriented Middleware Selection for Cooperative UAV Swarms</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:40–17:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('main-paper-ts11-6');return false;">Measurement-Driven Evaluation of Drone-Based Augmented Reality for Georeferenced Object Placement at Long Range</a>
+                <button class="btn-abstract" onclick="abrirModal('main-abs-ts11-6')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+  <!-- ===== Painel Mini Auditorium (on-line) ===== -->
+  <div class="painel" id="painel-mini">
+    <section>
+      <h2>Day 2 — Mini Auditorium</h2>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Activity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="hora">07:30–08:00</td><td>Registration Desk Opening &amp; Welcome Coffee</td></tr>
+          <tr><td class="hora">08:00–09:40</td><td><a href="#ts4"><strong>TS4 — Online Session</strong></a></td></tr>
+          <tr><td class="hora">09:40–10:00</td><td class="pausa">Coffee Break</td></tr>
+          <tr><td class="hora">10:00–11:40</td><td><a href="#ts6"><strong>TS6 — Online Session</strong></a></td></tr>
+          <tr><td class="hora">12:00–13:00</td><td class="pausa">Lunch</td></tr>
+          <tr><td class="hora">13:00–14:40</td><td><a href="#ts8"><strong>TS8 — Online Session</strong></a></td></tr>
+          <tr><td class="hora">14:40–15:00</td><td class="pausa">Coffee Break</td></tr>
+          <tr><td class="hora">15:00–17:00</td><td><a href="#ts10"><strong>TS10 — Online Session</strong></a></td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts4">
+      <h2>TS4 — Online Session</h2>
+      <p class="nota">08:00 – 09:40 · Mini Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">08:00–08:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts4-1');return false;">Conceptual Design and Biomechanical Analysis of a Semi-Active Shoulder–Elbow Exoskeleton for Industrial Applications</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts4-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">08:20–08:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts4-2');return false;">Design, Modeling and Finite Element Analysis of a Robotic Spine Exoskeleton for Active Deformity Correction</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts4-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">08:40–09:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts4-3');return false;">Selecting Vision Systems for Industrial Applications: A Multi-Criteria Decision Framework</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts4-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">09:00–09:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts4-4');return false;">Tactile Knocker: Gaze Steering via Physical Stimuli for Safe Alerting in an Educational Workshop</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts4-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">09:20–09:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts4-5');return false;">Robotic Pencil Drawing: Improving Shade Reproduction Through Optical Measurement</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts4-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts6">
+      <h2>TS6 — Online Session</h2>
+      <p class="nota">10:00 – 11:40 · Mini Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">10:00–10:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts6-1');return false;">Preliminary Single-Subject Comparative Evaluation of sEMG Acquisition Systems for Hand Gesture Recognition in Neuroprosthetic Control</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts6-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">10:20–10:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts6-2');return false;">Software-in-the-Loop Validation of a Real-Time sEMG Control Pipeline for a Five-Finger Prosthetic Hand</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts6-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">10:40–11:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts6-3');return false;">HMI and Visualization Layers for Soft PLC-Oriented Industrial Control Systems: Requirements and a Node-RED Case Study</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts6-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">11:00–11:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts6-4');return false;">Hand–Eye Calibration as a Hierarchical Screw-Axis Procrustes Problem: Exact Compatibility, SVD, and Davenport Solvers</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts6-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">11:20–11:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts6-5');return false;">Measurement-Aware Reinforcement Learning for UAV Downlink Resource Control under Communication Uncertainty</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts6-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts8">
+      <h2>TS8 — Online Session</h2>
+      <p class="nota">13:00 – 14:40 · Mini Auditorium · 5 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">13:00–13:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts8-1');return false;">A Tactical CubeSat Architecture for LiDAR-Based Lunar Landing Risk Assessment</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts8-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">13:20–13:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts8-2');return false;">Real-Time Evaluation of an Electric Vehicle Traction System Based on Indirect Field-Oriented Control on a Typhoon HIL Platform</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts8-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">13:40–14:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts8-3');return false;">Measurement-Driven Self-Healing LR2021 Mesh: ETX–Q-Score Comparison and Near-Margin Airborne-Relay Evaluation</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts8-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">14:00–14:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts8-4');return false;">Cascaded Model-Free Dynamic Compensation for Trajectory Tracking of Cooperative Mobile Robot Formations</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts8-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">14:20–14:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts8-5');return false;">An Error-Dependent Nonlinear Sliding Mode Controller for Robust Trajectory Tracking of an Aerial Manipulator</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts8-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="ts10">
+      <h2>TS10 — Online Session</h2>
+      <p class="nota">15:00 – 17:00 · Mini Auditorium · 6 papers</p>
+      <table class="tabela-programa">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Paper</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hora">15:00–15:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-1');return false;">LiDAR Scout Rover: A Distributed ROS 2 Architecture for Robust Multi-Layer Autonomous Navigation</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-1')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">15:20–15:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-2');return false;">Methodology for Ranking UGCVs for the Brazilian Armed Forces Based on a Hybrid Approach of the LOPCOW and OPARA Multicriteria Decision-Making Methods</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-2')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">15:40–16:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-3');return false;">Impact of Velocity Observers on Friction Compensation and Energy Reconstruction in Motor-Side Sensed Haptic Interfaces</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-3')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:00–16:20</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-4');return false;">Robust Impedance Control Synthesis within a Generalized Output Regulation Framework for a 1-DOF Mechanical System</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-4')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:20–16:40</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-5');return false;">Characterization of Soft-Robot-Induced Variability in Ultrasonic Thickness Measurement</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-5')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="hora">16:40–17:00</td>
+            <td>
+              <div class="paper-linha">
+                <a class="paper-titulo" onclick="abrirModal('mini-paper-ts10-6');return false;">Quasi-Static Analysis and Experimental Validation of a Microspine Gripping System for a Quadruped Climbing Robot on Rough Concrete</a>
+                <button class="btn-abstract" onclick="abrirModal('mini-abs-ts10-6')">Abstract</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</main>
+<!-- ===== Modais dos trabalhos — Main TS5: autores ===== -->
+<div class="modal" id="main-paper-ts5-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts5-1')">&times;</button>
+    <h3>VR and Robotic Rehabilitation: Results of a Systematic Review Following PRISMA Guidelines</h3>
+    <ul class="autores">
+      <li><span class="nome">Kato, F.; Snow, P.; Jing-Chen, H.</span><br><span class="inst">Future Robotics Organization, Waseda University</span><br><span class="pais">Tokyo, Japan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts5-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts5-2')">&times;</button>
+    <h3>Iterated Invariant EKF for 3D Landmark-Aided Inertial Navigation</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza Santana, H.; Virgolino Soares, J.; Meggiolaro, M.</span><br><span class="inst">Pontifícia Universidade Católica</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts5-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts5-3')">&times;</button>
+    <h3>Perimeter Defense Game with Obstacles</h3>
+    <ul class="autores">
+      <li><span class="nome">Szénási, S.; Harmati, I.</span><br><span class="inst">Budapest University of Technology and Economics</span><br><span class="pais">Budapest, Hungary</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts5-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts5-4')">&times;</button>
+    <h3>Covert System Identification Under Timing Constraints: A Static Linear Model and Its Detectability Implications</h3>
+    <ul class="autores">
+      <li><span class="nome">Mattos, V.; Sobreira, G.; Bhaya, A.; Oliveira de Sa, A.; Prado, C.; Machado, R.; Srivastava, G.; Menasche, D.</span><br><span class="inst">Universidade Federal do Rio de Janeiro (UFRJ)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts5-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts5-5')">&times;</button>
+    <h3>EmbodiedAI: A Hardware Abstraction Layer for the Unitree G1 EDU</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza, V.; Sá, H.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Main TS7: autores ===== -->
+<div class="modal" id="main-paper-ts7-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts7-1')">&times;</button>
+    <h3>ResNet+IMU Sensor Fusion for Frame-to-Frame Visual-Inertial Translation Estimation in UAVs</h3>
+    <ul class="autores">
+      <li><span class="nome">Nascimento, G.; López-Flores, M.; Baldivieso, T.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts7-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts7-2')">&times;</button>
+    <h3>Measurement-Driven Evaluation of Physics-Informed Multi-Agent Reinforcement Learning</h3>
+    <ul class="autores">
+      <li><span class="nome">N. Arruda-Oliveira, D.; W. Duarte, G.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts7-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts7-3')">&times;</button>
+    <h3>A Reproducible 3D-Printed Robotic Fixture with Potentiometric Feedback and Vision-Based Readout for Handheld Multimeter Calibration</h3>
+    <ul class="autores">
+      <li><span class="nome">Augusto Martins, A.; Poiani Lopes Mendes, A.</span><br><span class="inst">Instituto de Pesquisas Tecnológicas (IPT)</span><br><span class="pais">São Paulo, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts7-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts7-4')">&times;</button>
+    <h3>Experimental Evaluation of UAV-Based Multimodal Imaging System for Produced Water Detection in Offshore Environments</h3>
+    <ul class="autores">
+      <li><span class="nome">Mendanha, R.; Alves, C.; Rodrigues, D.; Motta, M.; Mattos, M.; Santos, J.; Muskardin, T.</span><br><span class="inst">OceanPact</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts7-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts7-5')">&times;</button>
+    <h3>BMS-Based Arm Energy Characterization of the Unitree G1 EDU</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza, V.; Sá, H.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Main TS9: autores ===== -->
+<div class="modal" id="main-paper-ts9-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts9-1')">&times;</button>
+    <h3>Development of a Portable Process Multicalibrator for Measurement and Signal Simulation with BLE Connectivity for Metrological Automation</h3>
+    <ul class="autores">
+      <li><span class="nome">Pardo, M.</span><br><span class="inst">Metrotec-Parsensors</span><br><span class="pais">Santo André, SP, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts9-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts9-2')">&times;</button>
+    <h3>Trustworthy Intelligent Measurement for Industrial Weighing: A Context-Aware Framework for Reliability, Auditability, and Metrological Traceability</h3>
+    <ul class="autores">
+      <li><span class="nome">Bajraktari, I.</span><br><span class="inst">TDI Metrology Calibration Laboratory</span><br><span class="pais">Elbasan, Albania</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts9-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts9-3')">&times;</button>
+    <h3>Dynamic Timed Elastic Band Based Trajectory Planning for Car-Like Mobile Robots</h3>
+    <ul class="autores">
+      <li><span class="nome">Kádár, A.; Szádeczky-Kardoss, E.</span><br><span class="inst">Budapest University of Technology and Economics</span><br><span class="pais">Budapest, Hungary</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts9-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts9-4')">&times;</button>
+    <h3>Pedestrian Multi-HMD with Relative Pose Estimation Using Interactive QR Codes: Using GNSS and VPS Data Encoded in Real-Time in QR Codes</h3>
+    <ul class="autores">
+      <li><span class="nome">Kataoka, I.</span><br><span class="inst">Tokai University</span><br><span class="pais">Hiratsuka &amp; Tokyo, Japan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts9-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts9-5')">&times;</button>
+    <h3>Temporal Characterization of IMU and LiDAR Data in the Unitree G1 EDU</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza, V.; Sá, H.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Main TS11: autores ===== -->
+<div class="modal" id="main-paper-ts11-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-1')">&times;</button>
+    <h3>Efficient RGB-IR Fusion for UAV Object Detection with Mamba-2</h3>
+    <ul class="autores">
+      <li><span class="nome">Tonon, R.; López-Flores, M.; Goldschmidt, R.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts11-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-2')">&times;</button>
+    <h3>Comparative Evaluation of Low-Cost Sensing and Mapping Solutions for Teleoperated Ground Robots in USAR</h3>
+    <ul class="autores">
+      <li><span class="nome">Peccini Machado, F.; Silva Mendes, K.; Tavares Pariz, J.; Amorim, P.; Mota Alves, L.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts11-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-3')">&times;</button>
+    <h3>Distributed Observer Design for Multi-Agent Systems with Time-Varying Communication Delays: A Lyapunov-Krasovskii Approach</h3>
+    <ul class="autores">
+      <li><span class="nome">Moreno, A.; Pellanda, P.; Sá, H.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts11-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-4')">&times;</button>
+    <h3>YOLO Benchmarking for Obstacle Detection on Unitree G1</h3>
+    <ul class="autores">
+      <li><span class="nome">Souza, V.; Sá, H.; López-Flores, M.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts11-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-5')">&times;</button>
+    <h3>Measurement-Oriented Middleware Selection for Cooperative UAV Swarms</h3>
+    <ul class="autores">
+      <li><span class="nome">López-Flores, M.; Botelho, W.; Chagas, F.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="main-paper-ts11-6">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-paper-ts11-6')">&times;</button>
+    <h3>Measurement-Driven Evaluation of Drone-Based Augmented Reality for Georeferenced Object Placement at Long Range</h3>
+    <ul class="autores">
+      <li><span class="nome">de Oliveira Carvalho, B.; López-Flores, M.; Junior, F.; De Oliveira, J.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Mini TS4: autores ===== -->
+<div class="modal" id="mini-paper-ts4-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts4-1')">&times;</button>
+    <h3>Conceptual Design and Biomechanical Analysis of a Semi-Active Shoulder–Elbow Exoskeleton for Industrial Applications</h3>
+    <ul class="autores">
+      <li><span class="nome">Zhetenbayev, N.; Madikhov, S.; Zikirbay, K.; Bizhanov, D.</span><br><span class="inst">Almaty University of Power Engineering (AUPET)</span><br><span class="pais">Almaty, Kazakhstan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts4-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts4-2')">&times;</button>
+    <h3>Design, Modeling and Finite Element Analysis of a Robotic Spine Exoskeleton for Active Deformity Correction</h3>
+    <ul class="autores">
+      <li><span class="nome">Zhetenbayev, N.; Tassybayeva, U.; Orazaliyeva, S.; Zhauyt, A.</span><br><span class="inst">Almaty University of Power Engineering (AUPET)</span><br><span class="pais">Almaty, Kazakhstan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts4-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts4-3')">&times;</button>
+    <h3>Selecting Vision Systems for Industrial Applications: A Multi-Criteria Decision Framework</h3>
+    <ul class="autores">
+      <li><span class="nome">Khamis Alhajj Abdallah, M.; Pšenka, R.; Štubňa, M.</span><br><span class="inst">Slovak University of Technology in Bratislava</span><br><span class="pais">Bratislava, Slovakia</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts4-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts4-4')">&times;</button>
+    <h3>Tactile Knocker: Gaze Steering via Physical Stimuli for Safe Alerting in an Educational Workshop</h3>
+    <ul class="autores">
+      <li><span class="nome">Suenaga, T.; Miyataka, A.; Sasaki, M.; Okumura, T.; Fujiwara, K.</span><br><span class="inst">National Institute of Technology, Sendai College</span><br><span class="pais">Sendai, Japan</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts4-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts4-5')">&times;</button>
+    <h3>Robotic Pencil Drawing: Improving Shade Reproduction Through Optical Measurement</h3>
+    <ul class="autores">
+      <li><span class="nome">Dobiš, M.</span><br><span class="inst">Slovak University of Technology in Bratislava</span><br><span class="pais">Bratislava, Slovakia</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Mini TS6: autores ===== -->
+<div class="modal" id="mini-paper-ts6-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts6-1')">&times;</button>
+    <h3>Preliminary Single-Subject Comparative Evaluation of sEMG Acquisition Systems for Hand Gesture Recognition in Neuroprosthetic Control</h3>
+    <ul class="autores">
+      <li><span class="nome">Sandu, R.; Doroftei, I.; Ciocoiu, I.</span><br><span class="inst">"Gheorghe Asachi" Technical University of Iasi</span><br><span class="pais">Iasi, Romania</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts6-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts6-2')">&times;</button>
+    <h3>Software-in-the-Loop Validation of a Real-Time sEMG Control Pipeline for a Five-Finger Prosthetic Hand</h3>
+    <ul class="autores">
+      <li><span class="nome">Sandu, R.; Doroftei, I.; Ciocoiu, I.</span><br><span class="inst">"Gheorghe Asachi" Technical University of Iasi</span><br><span class="pais">Iasi, Romania</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts6-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts6-3')">&times;</button>
+    <h3>HMI and Visualization Layers for Soft PLC-Oriented Industrial Control Systems: Requirements and a Node-RED Case Study</h3>
+    <ul class="autores">
+      <li><span class="nome">Pšenka, R.; Lukáč, M.; Khamis Alhajj Abdallah, M.; Sedlačko, Š.; Schvarc, M.; Štubňová, Ž.</span><br><span class="inst">Slovak University of Technology in Bratislava</span><br><span class="pais">Bratislava, Slovakia</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts6-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts6-4')">&times;</button>
+    <h3>Hand–Eye Calibration as a Hierarchical Screw-Axis Procrustes Problem: Exact Compatibility, SVD, and Davenport Solvers</h3>
+    <ul class="autores">
+      <li><span class="nome">Condurache, D.</span><br><span class="inst">"Gheorghe Asachi" Technical University of Iasi</span><br><span class="pais">Iasi, Romania</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts6-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts6-5')">&times;</button>
+    <h3>Measurement-Aware Reinforcement Learning for UAV Downlink Resource Control under Communication Uncertainty</h3>
+    <ul class="autores">
+      <li><span class="nome">Haq, I.; Lamonaca, F.</span><br><span class="inst">Università della Calabria</span><br><span class="pais">Cosenza, Italy</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Mini TS8: autores ===== -->
+<div class="modal" id="mini-paper-ts8-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts8-1')">&times;</button>
+    <h3>A Tactical CubeSat Architecture for LiDAR-Based Lunar Landing Risk Assessment</h3>
+    <ul class="autores">
+      <li><span class="nome">Cubillos, X.; Lamas Samanamud, G.; Santos, L.; da Rocha Ilardino, C.; Antunes, V.</span><br><span class="inst">Opencadd Advanced Technology</span><br><span class="pais">São Paulo, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts8-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts8-2')">&times;</button>
+    <h3>Real-Time Evaluation of an Electric Vehicle Traction System Based on Indirect Field-Oriented Control on a Typhoon HIL Platform</h3>
+    <ul class="autores">
+      <li><span class="nome">Silva, V.; Luiz, R.; Henrique Silva Morais, T.; Silva, W.; Fioravante da Silva Diniz, W.; de Almeida, W.; Pugliese, L.; Bernardes Vitor, G.</span><br><span class="inst">Universidade Federal de Itajubá (UNIFEI)</span><br><span class="pais">Itabira, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts8-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts8-3')">&times;</button>
+    <h3>Measurement-Driven Self-Healing LR2021 Mesh: ETX–Q-Score Comparison and Near-Margin Airborne-Relay Evaluation</h3>
+    <ul class="autores">
+      <li><span class="nome">Moore, C.; López-Flores, M.; Batista da Silva, L.; De Souza, F.; Vaz dos Anjos Santos, A.; De Souza, B.; Da Silva Teixeira, A.; Ferreira Rosa, P.</span><br><span class="inst">Instituto Militar de Engenharia (IME)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts8-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts8-4')">&times;</button>
+    <h3>Cascaded Model-Free Dynamic Compensation for Trajectory Tracking of Cooperative Mobile Robot Formations</h3>
+    <ul class="autores">
+      <li><span class="nome">Amagua, D.; Andaluz, G.; Leica, P.; Camacho, O.</span><br><span class="inst">Escuela Politécnica Nacional</span><br><span class="pais">Quito, Ecuador</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts8-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts8-5')">&times;</button>
+    <h3>An Error-Dependent Nonlinear Sliding Mode Controller for Robust Trajectory Tracking of an Aerial Manipulator</h3>
+    <ul class="autores">
+      <li><span class="nome">Andaluz, G.; Leica, P.; Proaño, P.; Chamorro, W.; Morales, L.; Quito, A.</span><br><span class="inst">Escuela Politécnica Nacional</span><br><span class="pais">Quito, Ecuador</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos trabalhos — Mini TS10: autores ===== -->
+<div class="modal" id="mini-paper-ts10-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-1')">&times;</button>
+    <h3>LiDAR Scout Rover: A Distributed ROS 2 Architecture for Robust Multi-Layer Autonomous Navigation</h3>
+    <ul class="autores">
+      <li><span class="nome">Nguyen, L.; Boggs, N.; Rodriguez, R.; Patino, A.; Montano, Z.</span><br><span class="inst">University of Houston-Clear Lake</span><br><span class="pais">Houston, TX, USA</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts10-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-2')">&times;</button>
+    <h3>Methodology for Ranking UGCVs for the Brazilian Armed Forces Based on a Hybrid Approach of the LOPCOW and OPARA Multicriteria Decision-Making Methods</h3>
+    <ul class="autores">
+      <li><span class="nome">Diniz, B.; Pereira, D.; Farias, D.; Santos, J.; Santos, V.; Gomes, E.; Moreira, M.; Dos Santos, M.; Araújo, D.</span><br><span class="inst">Universidade Federal Fluminense (UFF)</span><br><span class="pais">Rio de Janeiro, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts10-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-3')">&times;</button>
+    <h3>Impact of Velocity Observers on Friction Compensation and Energy Reconstruction in Motor-Side Sensed Haptic Interfaces</h3>
+    <ul class="autores">
+      <li><span class="nome">Moreira, P.; Caurin, G.; da Silva Harrison, A.; de Castro Martins, T.</span><br><span class="inst">Universidade de São Paulo (USP)</span><br><span class="pais">São Carlos, SP, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts10-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-4')">&times;</button>
+    <h3>Robust Impedance Control Synthesis within a Generalized Output Regulation Framework for a 1-DOF Mechanical System</h3>
+    <ul class="autores">
+      <li><span class="nome">Araujo Fernandes, A.; Cruz Neto, H.; Neves Maitan, L.; G. Vergamini, E.; Zanette, C.; F. dos Santos, L.; Boaventura, T.</span><br><span class="inst">Universidade de São Paulo (USP)</span><br><span class="pais">São Carlos, SP, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts10-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-5')">&times;</button>
+    <h3>Characterization of Soft-Robot-Induced Variability in Ultrasonic Thickness Measurement</h3>
+    <ul class="autores">
+      <li><span class="nome">Lantyer Cordeiro de Araujo Sobrinho, N.; do Patrocínio Dias, P.; Santana Queiroz, R.; Mendes, J.; Silva, L.</span><br><span class="inst">SENAI CIMATEC</span><br><span class="pais">Salvador, Brazil</span></li>
+    </ul>
+  </div>
+</div>
+<div class="modal" id="mini-paper-ts10-6">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-paper-ts10-6')">&times;</button>
+    <h3>Quasi-Static Analysis and Experimental Validation of a Microspine Gripping System for a Quadruped Climbing Robot on Rough Concrete</h3>
+    <ul class="autores">
+      <li><span class="nome">Ignacio Taype, F.; Castro Alfaro, G.; Nieves Acosta, A.; Ronceros Rivas, J.</span><br><span class="inst">Universidad Peruana de Ciencias Aplicadas (UPC)</span><br><span class="pais">Lima, Peru</span></li>
+    </ul>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Main TS5 ===== -->
+<div class="modal" id="main-abs-ts5-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts5-1')">&times;</button>
+    <h3>Abstract — VR and Robotic Rehabilitation: Results of a Systematic Review Following PRISMA Guidelines</h3>
+    <div class="abstract-texto"><p>In recent years, the growing elderly population and the global spread of infectious diseases have significantly increased the importance of rehabilitation utilizing Virtual Reality (VR) and robotics. Various studies have explored rehabilitation by integrating wearable robotic devices within VR environments. However, methodological heterogeneity and inconsistencies in defining "virtual reality" and "robotics" complicate clinical translation. This study details a systematic review methodology using the PRISMA 2020 framework to evaluate the effectiveness of combined immersive extended reality (XR) and robotic interventions. A structured search across six databases (PubMed, Scopus, Web of Science, OVID, ProQuest, and CINAHL) for literature published between July 2015 and July 2025 yielded 3,874 records. After removing duplicates and conducting title/abstract screening, 39 articles underwent full-text review, with only 7 articles meeting the strict inclusion criteria of utilizing truly immersive XR and active robotic systems for affected clinical populations. Initial Risk of Bias assessment using ROBINS-I demonstrated that most included non-randomized studies carry serious or critical risk of bias, primarily due to confounding factors, small sample sizes, and a lack of control groups. These findings highlight a critical shortage of rigorous clinical proof-of-concept studies and underscore the necessity for standardized definitions and high-quality trials to support clinical implementation.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts5-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts5-2')">&times;</button>
+    <h3>Abstract — Iterated Invariant EKF for 3D Landmark-Aided Inertial Navigation</h3>
+    <div class="abstract-texto"><p>Inertial navigation systems aided by three-dimensional landmark measurements constitute a fundamental problem in robotic perception and state estimation. Classical SO(3)-based Extended Kalman Filter (SO(3)-EKF) approaches provide practical solutions, but suffer from the false observability problem, in which the filter becomes overconfident in unobservable directions, leading to degraded estimation performance. The Invariant EKF (IEKF) addresses this limitation by reformulating the system dynamics as a group-affine system on a Lie group, although its measurement update does not fully satisfy certain state compatibility properties. More recently, the Iterated Invariant EKF (IterIEKF) was proposed to further improve the IEKF by ensuring, in the low-noise regime, that the estimated state remains on the observed state manifold while the uncertainty is confined to its tangent space. In this work, we formulate and apply the IterIEKF to landmark-based inertial 3D localization for the first time. Through numerical simulations, we show that the proposed approach outperforms the classical SO(3)-EKF, the Iterated SO(3)-EKF, and the IEKF in terms of both estimation accuracy and consistency.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts5-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts5-3')">&times;</button>
+    <h3>Abstract — Perimeter Defense Game with Obstacles</h3>
+    <div class="abstract-texto"><p>The perimeter defense game is a type of reach-avoid game, where the goal of the attacker team is to reach the target area and the defender team aims to prevent it. In this paper, the problem of guarding a convex target area wherein the Defender is constrained to move along its perimeter is posed and solved. The mobile Attacker seeks to reach the perimeter of the convex target. The Attacker and the Defender have the same speed. The Defender can execute a point capture, which means it can intercept with a zero capture radius. In a game region, there is an obstacle outside the target area that the Attacker must avoid. The Attacker and Defender play a zero-sum differential game where the payoff/cost is the terminal distance between the Defender and the Attacker measured along the perimeter of the target. The Attacker wins if it reaches the perimeter of the target before the Defender can make an interception. The solution method first solves the problem without the obstacle; then, if the optimal path of the Attacker is blocked by the obstacle, the tree-like graph is constructed. The tree-like graph consists of the tangents between the obstacle and the Attacker, the arcs between the tangent points along the obstacle, and the tangents between the obstacle and the target. The new candidates for the breach point are the tangent points of the tangents between the obstacle and the target along the target. The path of the Attacker is chosen from the tree-like graph to maximize the payoff.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts5-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts5-4')">&times;</button>
+    <h3>Abstract — Covert System Identification Under Timing Constraints: A Static Linear Model and Its Detectability Implications</h3>
+    <div class="abstract-texto"><p>This paper studies covert system identification in cyberphysical systems, where an attacker infers plant dynamics while attempting to remain stealthy. We introduce a lightweight static linear model in which the time to execute a setpoint change is proportional to the commanded speed difference. On a Siemens PROFINET testbed this gain captures the drive's ramp response accurately but not its terminal overshoot. That omitted transient becomes the attacker's main exposure: on real traces, the residual left by the linear masking procedure is detected by two anomaly monitors, Process-Aware Stealthy-Attack Detection (PASAD) and the CUSUM change detector. Across the cascade identification and staircase attack strategies defined in the paper, the stealth boundary relates to the plant's own settling transients, a structural limit for this class of models under the adopted detector-calibration regime. Comparison against dynamic models obtained by N4SID, trained at multiple excitation amplitudes, shows that the evaluated N4SID models do not improve stealth over the structure-informed ramp model. Since per-cycle computation is negligible for both procedures, the binding trade-off is not inference cost but whether the attacker can acquire and refresh a model without injecting detectable perturbations.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts5-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts5-5')">&times;</button>
+    <h3>Abstract — EmbodiedAI: A Hardware Abstraction Layer for the Unitree G1 EDU</h3>
+    <div class="abstract-texto"><p>Programming the Unitree G1 EDU requires developers to integrate multiple software components, including network communication, RGB-D camera configuration, object detection, depth estimation, and locomotion and arm-control clients. This paper introduces EmbodiedAI, a platform-specific Python integration layer that encapsulates recurring initialization and subsystem-management procedures for an Intel RealSense D4xx camera, an Ultralytics YOLO detector, and the Unitree G1 EDU SDK. The evaluation comprises ten paired client-side implementations organized into basic, intermediate, and advanced tasks. Each task was implemented with and without the proposed framework. The evaluated static metrics include non-empty and non-comment Lines of Code (LOC), Selected Control-Flow Construct Count (CFCC), defined as the number of if, for, while, and try constructs, and the WITHOUT/WITH LOC ratio. Across all ten experiments, the framework reduced client-side LOC by an average of 51.6%. For the basic and intermediate experiments, the average LOC reduction was 60.8%, while CFCC was reduced by 62.7%, excluding Experiment 3, in which both implementations contained no selected control-flow constructs. The reductions became smaller in the advanced experiments, reaching 4.2% for LOC in the complete social state-machine example. The results indicate that the framework reduces recurring client-side integration code in the evaluated examples, while the benefit decreases when task-specific control logic becomes dominant. The evaluation is limited to static client-side metrics and does not establish improvements in development time, cognitive load, defect rates, maintainability, or real-time performance.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Main TS7 ===== -->
+<div class="modal" id="main-abs-ts7-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts7-1')">&times;</button>
+    <h3>Abstract — ResNet+IMU Sensor Fusion for Frame-to-Frame Visual-Inertial Translation Estimation in UAVs</h3>
+    <div class="abstract-texto"><p>Visual-Inertial Odometry (VIO) is important for UAV navigation in GPS-denied environments, where camera and inertial measurement unit (IMU) measurements can provide short-term motion estimates under changing visual and motion conditions. This paper evaluates a lightweight ResNet+IMU fusion architecture for frame-to-frame 3D translation estimation using the EuRoC Micro Aerial Vehicle (MAV) dataset. The model combines visual features extracted from a pre-trained ResNet-50 backbone with summarized inertial measurements and adopts a multi-task formulation that jointly estimates relative translation and classifies motion magnitude. Two experimental configurations are evaluated: a baseline using mean IMU features and MSE regression loss, and an expanded configuration using mean and standard-deviation IMU features, visual data augmentation, Smooth L1 regression loss, and additional training samples. Under the reported validation protocol, the expanded configuration reduced the average translation MAE by 31.8% and achieved a frame-to-frame translation MAE of 4.8 mm on the V1 01 easy sequence. However, the same configuration increased the MSE by 436.7% on the MH 05 difficult sequence, revealing sporadic high-deviation failures despite improved average error. Since multiple factors differ between the two configurations, the results should be interpreted as a configuration-level comparison rather than an isolated ablation study. The findings highlight the need for outlier analysis, uncertainty discussion, and reliability-aware evaluation before considering real-world UAV deployment.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts7-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts7-2')">&times;</button>
+    <h3>Abstract — Measurement-Driven Evaluation of Physics-Informed Multi-Agent Reinforcement Learning</h3>
+    <div class="abstract-texto"><p>Reliable deployment of autonomous UAV swarms requires coordination policies capable of maintaining safety and performance under operating conditions not encountered during training. Although Physics-Informed Multi-Agent Reinforcement Learning (MARL) has recently shown promising generalization capabilities in distributed robotic coordination, its quantitative characterization in aerial swarm systems remains insufficiently explored from a measurement and reproducibility perspective. This paper presents a reproducible measurement-driven evaluation framework for decentralized UAV swarm coordination and applies it to IPPO, MADDPG, MAPPO, and Physics-Informed MARL (Ph-MARL) using the VMAS multi-agent physics simulator in the fixed altitude Reverse Transport scenario. Here, measurement-driven denotes a predeclared evaluation contract in which controllers are assessed using consistent metrics, thresholds, aggregation rules, uncertainty reporting, and out-of-distribution (OOD) perturbations before cross-controller comparisons are performed. The framework systematically evaluates policy robustness in a controlled physics-based simulation environment under sensor noise, observation delay, actuation disturbance, and combined stress using complementary measures of coordination quality, operational safety, control regularity, and generalization degradation. In Ph-MARL, the physics-informed component is provided by the port-Hamiltonian/IDA-PBC policy structure, which constrains the learned energy, interconnection, and damping terms according to the robot interaction graph; the present study does not model full UAV dynamics such as attitude, thrust, or aerodynamics. Results identify which measurements satisfy a common evaluation contract and which remain evaluator-specific, supporting fair comparison only for harmonized metrics while preserving within-controller OOD analysis for source-specific measures. By establishing a reproducible measurement protocol for evaluating generalization robustness in aerial swarm coordination, this work advances the quantitative validation of physics-informed reinforcement learning for deployment-oriented autonomous multi-UAV systems.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts7-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts7-3')">&times;</button>
+    <h3>Abstract — A Reproducible 3D-Printed Robotic Fixture with Potentiometric Feedback and Vision-Based Readout for Handheld Multimeter Calibration</h3>
+    <div class="abstract-texto"><p>Handheld digital multimeters are designed mainly for human operation. Rotary selectors, model-dependent housings, manually routed test leads, and displays without machine-readable interfaces require repeated physical and visual interaction during calibration. This paper presents a non-invasive robotic fixture that combines parametric 3D-printed mechanics, a continuous-rotation servo, potentiometric feedback, computer vision, and a programmable reference calibrator. The modular PETG structure uses sliding supports, compliant alligator-style clamps, an adaptable selector grip, and a herringbone gear reduction. The reduction increases the available selector torque and expands the angular excursion measured by a multiturn 10-kΩ potentiometer. An STM32F1 device, from the STM32 family of 32-bit microcontrollers, reads the sensor through its ADC and controls selector positioning. New instruments are configured through a teach-and-repeat procedure, while positions, functions, calibration points, terminal information, and display regions are stored in editable JSON files. A specialized seven-segment OCR pipeline localizes and rectifies the display, compensates illumination, groups segment candidates, and validates readings by temporal consensus. The application coordinates the fixture and a Fluke 5520A calibrator, applies plausibility checks, and writes tab-separated data for spreadsheets or third-party calibration systems. Manual mounting, profile preparation, ROI confirmation, and lead changes remain operator tasks; the results are feasibility observations rather than statistical performance estimates. Functional tests were performed with Minipa ET-1002 and ET-3200 instruments and a Fluke 87V. Observed complete sequences required approximately 8 min for the clamp meter, 10 min for the Fluke 87V, and 11 min for an 18-range sequence including fixture placement. Controlled repeatability, OCR-accuracy, mechanical-endurance, and safety studies are planned to advance the prototype toward a robust laboratory solution.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts7-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts7-4')">&times;</button>
+    <h3>Abstract — Experimental Evaluation of UAV-Based Multimodal Imaging System for Produced Water Detection in Offshore Environments</h3>
+    <div class="abstract-texto"><p>Offshore oil and gas operations require reliable sensing to detect low-contrast produced water plumes on the sea surface. This paper presents a UAV-based multimodal imaging system integrating ultraviolet (UV), visible, and infrared (IR) sensors for real-world environmental monitoring. Field experiments were conducted under realistic illumination, sea state, and altitude conditions. Results show that the UV channel provided the most consistent separability across images under the tested conditions, with even raw unprocessed data exhibiting moderate separability between clean seawater and surface features, while the thermal IR channel produced no significant discriminating signal under the tested daytime conditions. Across reflectance sensors, large-scale spatial smoothing and global contrast enhancement consistently improved feature discrimination. The study discusses practical trade-offs involving sensing capability, payload integration, operational complexity, and deployment feasibility.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts7-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts7-5')">&times;</button>
+    <h3>Abstract — BMS-Based Arm Energy Characterization of the Unitree G1 EDU</h3>
+    <div class="abstract-texto"><p>This article presents a systematic characterization of the energy consumption of the Unitree G1 EDU humanoid robot during controlled arm movement cycles of variable durations, using real-time monitoring of the Battery Management System (BMS) over the ROS 2 communication infrastructure. Six experimental conditions were evaluated: one static baseline condition and five arm-movement conditions with duration parameters ranging from 2 to 6 seconds, each condition comprising 1,000 samples collected at approximately 20 Hz via the /lf/bmsstate topic. Fundamental electrical quantities, including bus voltage, discharge current, instantaneous power, state of charge, and battery temperature, were recorded and statistically analyzed. The results demonstrate that arm movement raises mean power consumption from 128.9 W under the resting condition to values between 152.1 W and 158.8 W during the movement conditions, representing an increase of approximately 17.97% to 23.17% relative to the baseline. The maximum increase in mean discharge current magnitude was approximately 23.07%. Mean bus voltage decreased progressively along the fixed experimental sequence, which was accompanied by a reduction in battery SOC, whereas peak power stabilized at approximately 222 W across all movement conditions. The proposed methodology, based on open-source software and native ROS 2 interfaces, addresses a relevant gap in the humanoid robotics literature, where energy characterizations on accessible commercial platforms with fine temporal resolution and descriptive statistical analysis remain scarce. The obtained results provide preliminary reference values for energy-efficient trajectory planning, autonomy estimation, and energy-aware controller design in medium-sized humanoid robots.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Main TS9 ===== -->
+<div class="modal" id="main-abs-ts9-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts9-1')">&times;</button>
+    <h3>Abstract — Development of a Portable Process Multicalibrator for Measurement and Signal Simulation with BLE Connectivity for Metrological Automation</h3>
+    <div class="abstract-texto"><p>This paper presents the development methodology of a portable embedded system designed for advanced sensor integration, data acquisition, and calibration process automation. The proposed hardware utilizes Bluetooth Low Energy (BLE 5.0) connectivity and a 16-bit Analog to Digital Converter (ADC) equipped with a Programmable Gain Amplifier (PGA), achieving a resolution of approximately 1 μV in the 30 mV range, which ensures high sensitivity for reading multiple industrial and environmental variables, such as temperature (RTD sensors and various thermocouples), pressure, humidity, force, and torque. The technical differential of the device lies in its dual architecture, which also acts as a precision signal generator through a 16-bit Digital-to-Analog Converter (DAC), capable of generating voltage from 0 to 100 mV up to 1 VDC, electrical resistance (20 to 400 Ω), and emulating thermoelements. This integrated functionality enables both the calibration of panel instruments and adjustment in robotic automation loops. The system connects wirelessly to smartphones via an application developed in FlutterFlow for Android. On the mobile interface, data are displayed and processed for automated report generation, eliminating complex operations through physical keypads and reducing operator training time. The results demonstrate the feasibility of replacing multiple manual and isolated instruments with a single portable digital interface, ensuring overall metrological process efficiency.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts9-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts9-2')">&times;</button>
+    <h3>Abstract — Trustworthy Intelligent Measurement for Industrial Weighing: A Context-Aware Framework for Reliability, Auditability, and Metrological Traceability</h3>
+    <div class="abstract-texto"><p>Industrial weighing results increasingly support automated control, regulatory assessment, and operational decisions, yet their trustworthiness still depends on calibration quality, metrological traceability, measurement uncertainty, and the completeness of the evidence obtained under actual field conditions. This qualitative, standards-informed study analyses three anonymized non-automatic weighing instrument (NAWI) configurations: a 60,000 kg road vehicle platform scale for which position-dependent testing could only be partially executed; a 20,000 kg aggregate weighing subsystem in which 1,500 kg of calibrated reference masses (7.5% of Max) were combined with gravel through substitution loading; and a 10,000 kg suspended crane scale for which conventional eccentricity testing is technically inapplicable because loading occurs along a single vertical axis. The analysis distinguishes partial execution of an applicable test, controlled use of substitute material, and justified technical non-applicability. It links each condition to the available evidence, measurement-uncertainty implications, metrological-traceability evidence, residual systematic effects, and validity limits of the reported result. A context-aware metrological framework is proposed to characterize the instrument and operating context, classify test status, identify metrological consequences, evaluate evidence and auditability, apply a documented decision rule where appropriate, and issue conclusions bounded by the evidence obtained. When conformity is requested, indication error, expanded measurement uncertainty, and the applicable maximum permissible error are considered together. The framework does not replace established verification or calibration procedures; it adds a structured interpretative layer that prevents unsupported generalization and improves the transparency, auditability, and defensibility of calibration outcomes. The study is analytical and has not yet been experimentally validated; future evaluation using complete datasets and instrument-specific uncertainty budgets is therefore required.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts9-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts9-3')">&times;</button>
+    <h3>Abstract — Dynamic Timed Elastic Band Based Trajectory Planning for Car-Like Mobile Robots</h3>
+    <div class="abstract-texto"><p>This paper presents a speed-aware Dynamic Timed Elastic Band (TEB) based local trajectory planning architecture for car-like mobile robots in structured road environments. The proposed method extends a previously developed lateral TEB planner, in which obstacle avoidance and lane keeping were handled by a geometrical local planner, while longitudinal behavior was controlled separately by a Model Predictive Control (MPC) based adaptive distance controller. In contrast, the new architecture integrates velocity preservation directly into the local planning process, allowing the vehicle to maintain its desired speed whenever the surrounding traffic situation and optimization constraints make it feasible. The planner operates without an upper-level global path planner and generates a local sequence of waypoints from the currently perceived lane geometry and obstacle information. The terminal waypoint of the band is not fixed, which allows the optimized trajectory to adapt more flexibly to the local road structure and obstacle configuration. The optimization problem includes constraints and penalty terms for lane keeping, obstacle avoidance, and dynamically feasible motion, while the search space is narrowed to the relevant drivable region to improve practical convergence. The resulting trajectory is followed by a velocity-aware pure pursuit controller that adapts the steering response to the current vehicle speed and improves tracking stability during both lane keeping and avoidance maneuvers. The paper compares the proposed Dynamic TEB planner with the earlier lateral TEB plus MPC-based adaptive cruise control architecture. The comparison is carried out in MATLAB/Simulink driving scenarios involving nominal lane keeping, obstacle avoidance, and speed preservation. Performance is evaluated using collision occurrence, lateral tracking error, velocity tracking error, and acceleration smoothness. The results show that embedding the longitudinal speed objective into the local TEB formulation provides a more integrated planning behavior.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts9-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts9-4')">&times;</button>
+    <h3>Abstract — Pedestrian Multi-HMD with Relative Pose Estimation Using Interactive QR Codes: Using GNSS and VPS Data Encoded in Real-Time in QR Codes</h3>
+    <div class="abstract-texto"><p>We propose a shared positioning architecture for pedestrian multi-HMD outdoor mixed reality. Equipping every head-mounted display (HMD) with a dedicated RTK-GNSS receiver and Visual Positioning System (VPS) is costly and leaves uncorrelated localization errors between participants. Instead, a single shared positioning unit—a smartphone paired with an external RTK-GNSS receiver—fuses centimeter-accurate position with VPS-derived orientation and encodes the result as an Interactive QR Code: a QR code dynamically regenerated at fixed intervals. Each HMD user scans this code with the onboard camera; the 6-DOF relative transformation between the camera and the code is composed with the absolute world-frame pose encoded in the payload, yielding the HMD's own world-frame pose. Our hypothesis is that computing each HMD's pose relative to this single shared physical anchor yields higher inter-device consistency than having each device independently estimate its position in global coordinates (latitude and longitude) via GNSS or VPS: because all HMDs use the same QR code as their common local origin, their local coordinate frames are inherently consistent by construction, without per-device localization hardware or network communication. After initialization, each HMD relies on its own onboard inside-out tracking—using its IMU and cameras—to maintain its pose, producing smoother XR imagery than would be possible with GNSS or VPS updates alone, which are limited to 1–10 Hz. This method has the potential to achieve seamless integration between the physical environment and passthrough-based mixed reality in outdoor applications. Rather than presenting a fully developed system, this paper reports on the verification of individual component technologies using a prototype implementation.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts9-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts9-5')">&times;</button>
+    <h3>Abstract — Temporal Characterization of IMU and LiDAR Data in the Unitree G1 EDU</h3>
+    <div class="abstract-texto"><p>Autonomous navigation and state estimation in humanoid robots depend critically on the temporal quality of data produced by sensors such as Inertial Measurement Units (IMUs) and three-dimensional LiDARs. In the Unitree G1 EDU humanoid robot, communication between sensors and processing modules is mediated by the Data Distribution Service (DDS) protocol, implemented on top of CycloneDDS. Despite the widespread adoption of this middleware in modern robotic systems, its real-world temporal behaviour on specific embedded hardware and under actual operating conditions remains poorly documented in the literature, constituting a relevant gap for the design of sensory fusion and closed-loop control algorithms. This paper presents a detailed experimental characterisation of subscriber-side reception jitter for the robot's onboard IMU, accessed via the topic rt/lf/lowstate, and for the Livox Mid-360 LiDAR, via the topic rt/utlidar/cloud livox mid360, through a sequential data-collection protocol developed in Python using the unitree sdk2py library. A total of 2,434 IMU samples were collected, revealing a mean reception interval of 49.39 ms (≈20.25 Hz), a standard deviation of 0.414 ms, a 95th percentile of 49.95 ms, and a 99th percentile of 50.44 ms. For the LiDAR, 1,200 scans were recorded, yielding a mean interval of 100.19 ms (≈9.98 Hz), a standard deviation of 2.637 ms, a 95th percentile of 104.02 ms, a 99th percentile of 106.82 ms, and a mean of 20,038 points per scan. Under the evaluated static and sequential acquisition conditions, the IMU topic exhibited lower subscriber-side reception variability than the LiDAR topic. These measurements provide timing references for future sensor-fusion experiments on the Unitree G1 EDU. However, the individual contribution of DDS and the effects on SLAM, odometry, or state-estimation accuracy were not experimentally evaluated. The measurements were obtained during a single session with the robot stationary and the two sensor topics evaluated sequentially.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Main TS11 ===== -->
+<div class="modal" id="main-abs-ts11-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-1')">&times;</button>
+    <h3>Abstract — Efficient RGB-IR Fusion for UAV Object Detection with Mamba-2</h3>
+    <div class="abstract-texto"><p>RGB-IR fusion is an important strategy for improving object detection robustness in UAV-oriented perception, especially under low illumination and visual degradation. However, fusion modules for aerial platforms must balance detection accuracy with computational efficiency. This paper evaluates whether recent state-space formulations can improve this trade-off in RGB-IR object detection. Instead of proposing a new detector, we adopt COMO (CrOss-Mamba interaction and Offsetguided fusion) as a baseline and perform a controlled replacement of its Mamba-based fusion block while preserving the remaining detection pipeline. Two variants are evaluated: COMO-Mamba2, which replaces the original S6/CS6 operators with Mamba-2/SSD-inspired blocks, and COMO-VSSD, which uses a non-causal visual state-space formulation inspired by VSSD (Vision Mamba with Non-Causal State Space Duality). Experiments on DroneVehicle and LLVIP datasets show that the proposed variants preserve detection accuracy while improving practical inference speed under the evaluated protocol. On DroneVehicle, COMO-VSSD maintains the baseline mAP@0.5 and increases FPS by 42.9%. On LLVIP, it achieves mAP values comparable to the baseline while increasing FPS by 50.0%. These results indicate that recent state-space formulations, particularly non-causal visual mechanisms, are promising candidates for efficient RGB-IR fusion in UAV-oriented perception systems.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts11-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-2')">&times;</button>
+    <h3>Abstract — Comparative Evaluation of Low-Cost Sensing and Mapping Solutions for Teleoperated Ground Robots in USAR</h3>
+    <div class="abstract-texto"><p>Reliable and affordable ground robotic platforms for Urban Search and Rescue (USAR) remain a critical challenge, especially for cost-constrained deployments in public safety and defense. This paper presents an architecture for teleoperated ground robots designed for irregular terrain, developed through the systematic evaluation of industry-established sensing and mapping solutions. A comparative hardware study was conducted for 3D environment mapping, contrasting depth cameras (Intel RealSense D435 vs. Logitech C920e) and LiDAR sensors (Ouster vs. LDS-02), alongside five SLAM and depth estimation algorithms: Ouster Spherical Range Projection, Cartographer, ORB-SLAM3, MiDaS, and MapAnything. Dimensional reconstruction errors were measured against physical references: the Intel RealSense D435 achieved a 2.11% average error in a room scenario, MapAnything reached 5.50%, and MiDaS reached 15.17%. The LDS-02 combined with Cartographer matched the Ouster LiDAR's 2D mapping accuracy (6.24% vs. 5.74% dimensional error) at a fraction of the cost. ORB-SLAM3 was effective for sparse visual odometry but presented inherent monocular depth ambiguities. A hybrid track-and-leg locomotion system was developed in-house to traverse complex terrains. The resulting architecture demonstrates that cost-effective combinations of sensors and algorithms can meet USAR operational requirements. Current validation is bounded to laboratory and competition environments, with outdoor field trials established as the primary next step.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts11-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-3')">&times;</button>
+    <h3>Abstract — Distributed Observer Design for Multi-Agent Systems with Time-Varying Communication Delays: A Lyapunov-Krasovskii Approach</h3>
+    <div class="abstract-texto"><p>This paper addresses the design and analysis of distributed observers for multi-agent systems subject to time-varying communication delays. Unlike centralized approaches, the proposed distributed observer allows each agent to estimate the true system state by fusing local measurements with information received from neighboring agents over a delayed communication network. We employ Lyapunov-Krasovskii functional theory to derive sufficient conditions for observer stability, formulated as Linear Matrix Inequalities (LMIs). The key contribution is establishing the relationship between network topology, communication delays, and observer convergence rate. Numerical simulations demonstrate that the proposed approach achieves accurate state estimation even under significant communication delays, with convergence time inversely proportional to the coupling strength. The methodology is validated on a distributed sensor network scenario, where multiple sensors collaboratively estimate the state of a dynamic system.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts11-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-4')">&times;</button>
+    <h3>Abstract — YOLO Benchmarking for Obstacle Detection on Unitree G1</h3>
+    <div class="abstract-texto"><p>This study presents a comparative evaluation of six YOLO-based object detection models (YOLOv26n, YOLOv26s, YOLOv26m, YOLOv12n, YOLOv12s, and YOLOv12m) integrated with an Intel RealSense D435i depth camera on the Unitree G1 EDU humanoid robot, for obstacle detection and distance estimation in indoor environments. The system aligns color and depth image streams and employs two distance estimation methods: single-pixel reading at the bounding box centroid and the median of a surrounding region. All results are systematically recorded in CSV format for analysis. Experiments were conducted with a static chair whose nearest and farthest physical extents along the sensor viewing direction were measured at 1.40 m and 2.05 m, respectively, resulting in a geometric midpoint reference of 1.725 m. Under this controlled configuration, the larger models, YOLOv26m and YOLOv12m, achieved high chair-class detection confidence and small deviations from the nominal geometric reference, but exhibited network inference latency above 2,400 ms per frame. In contrast, the nano models, YOLOv26n and YOLOv12n, achieved the highest network inference throughput among the evaluated variants under the tested onboard hardware configuration. The regional-median sampling strategy produced lower deviations from the nominal geometric reference than single-pixel sampling across all six evaluated configurations. This work provides a controlled benchmarking procedure for characterizing embedded perception configurations on a humanoid robotic platform.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts11-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-5')">&times;</button>
+    <h3>Abstract — Measurement-Oriented Middleware Selection for Cooperative UAV Swarms</h3>
+    <div class="abstract-texto"><p>Cooperative Unmanned Aerial Vehicle (UAV) swarms depend on middleware that exchanges telemetry, commands, and compact sensing information reliably and in a timely manner. This study frames middleware selection in autonomous robotic swarms as a measurement problem. We propose a protocol-neutral ns-3 workflow. The workflow maps common UAV information classes to Micro Air Vehicle Link version 2 (MAVLink 2), Data Distribution Service for eXtremely Resource-Constrained Environments (DDS-XRCE), Message Queuing Telemetry Transport for Sensor Networks (MQTT-SN), and the Observe extension of the Constrained Application Protocol (CoAP Observe), and compares them under shared assumptions using latency, Packet Delivery Ratio (PDR), goodput, Age of Information (AoI), scalability, robustness under injected loss, and protocol-independent security-metadata overhead. In the ten-UAV baseline, MAVLink 2 yields the lowest mean delay (284.44 μs) and mean AoI (412.86 μs). Under 20% injected packet loss, DDS-XRCE achieves the highest PDR (0.854). MQTT-SN provides publish/subscribe decoupling but shows higher delay and weaker scalability in the tested topology, while CoAP Observe exhibits intermediate behavior for resource-oriented monitoring. These results are single-run point estimates derived under controlled ns-3 assumptions. Each experimental configuration was evaluated with a single complete simulation run using the legacy framework's default workload seed of 1. Therefore, the reported values do not quantify variability across independent simulation replications and should not be interpreted as evidence for field deployment.</p></div>
+  </div>
+</div>
+<div class="modal" id="main-abs-ts11-6">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('main-abs-ts11-6')">&times;</button>
+    <h3>Abstract — Measurement-Driven Evaluation of Drone-Based Augmented Reality for Georeferenced Object Placement at Long Range</h3>
+    <div class="abstract-texto"><p>Outdoor augmented reality (AR) from unmanned aerial vehicles (UAVs) requires a measurement chain that connects video pixels, camera pose, terrain geometry, and georeferenced coordinates with quantified accuracy. This paper presents a measurement-driven evaluation of a drone-based AR system for georeferenced object placement in real outdoor scenes. The system combines real-time kinematic (RTK) positioning, inertial camera attitude, calibrated perspective projection, terrain intersection, Open Graphics Library (OpenGL) rendering, optional orientation correction from known ground references, and Visual Geometry Grounded Transformer (VGGT)-based sparse georeferenced point-cloud generation. Compared with the previous short-range evaluation, this study emphasizes long-range measurement behavior and operational limitations. Two real flight datasets were evaluated. In an urban park, the system achieved mean errors of 2.13 m and 2.84 m under a planar-terrain assumption at approximately 100 m and 118 m altitude, and 2.38 m and 4.27 m when a 20 m resolution digital elevation model (DEM) was used. In a long-range dataset collected at an aeromodelling field, the mean error was 28.34 m at a mean target distance of 568.86 m, 8.47 m at 329.55 m, and 2.78 m at 92.55 m. Pearson analysis identified target distance as the dominant error-related variable. The results support the feasibility of drone-based georeferenced augmented reality for measurement and control applications, while showing that long-range operation remains limited by pose accuracy, terrain modeling, telemetry timing, and reference-data availability.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Mini TS4 ===== -->
+<div class="modal" id="mini-abs-ts4-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts4-1')">&times;</button>
+    <h3>Abstract — Conceptual Design and Biomechanical Analysis of a Semi-Active Shoulder–Elbow Exoskeleton for Industrial Applications</h3>
+    <div class="abstract-texto"><p>This paper presents the conceptual design of a semi-active shoulder–elbow exoskeleton for industrial applications intended to reduce physical loading during overhead tasks. A biomechanical analysis of the shoulder–elbow complex was performed, demonstrating that the gravitational moment acting on the shoulder joint increases with arm elevation. Based on this analysis, a lightweight semi-active architecture combining a passive spring mechanism with a Bowden cable-driven transmission was developed to provide posture-dependent assistive torque. In addition, a conceptual kinematic model and a force transmission mechanism were established to describe the operation of the proposed system. The remote actuation concept reduces the mass and inertia of the wearable structure while preserving the natural kinematics of the upper limb. The proposed design provides a practical foundation for the future development of an energy-efficient industrial exoskeleton for overhead work, including detailed CAD design, prototype fabrication, and experimental validation.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts4-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts4-2')">&times;</button>
+    <h3>Abstract — Design, Modeling and Finite Element Analysis of a Robotic Spine Exoskeleton for Active Deformity Correction</h3>
+    <div class="abstract-texto"><p>Spinal deformities, especially scoliosis, are a serious medical problem that can affect the musculoskeletal system and reduce quality of life. The aim of this study is to develop a conceptual model of a robotic exoskeleton for active correction of spinal deformities. A segmental exoskeleton structure based on linear electric actuators was proposed, taking into account the multi-joint kinematics of the human spine. The mechanical performance of the system was evaluated through mathematical modeling and finite element analysis (FEA) using the SolidWorks Simulation environment. The simulation results showed that the maximum stress reached σ_max = 22.65 MPa, which remains below the allowable limit of the selected material. In addition, the maximum displacement was u_max = 9.509 × 10⁻³ mm, while the maximum strain was ε_max = 8.339 × 10⁻⁵, indicating high structural stiffness and stability. The obtained results confirm the mechanical feasibility of the proposed exoskeleton design and provide a basis for further development, including the integration of a control system and the creation of an experimental prototype.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts4-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts4-3')">&times;</button>
+    <h3>Abstract — Selecting Vision Systems for Industrial Applications: A Multi-Criteria Decision Framework</h3>
+    <div class="abstract-texto"><p>The choice of vision systems remains a persistent challenge in industrial automation, especially in flexible manufacturing and real-time robotic control. Although frame-based and event-based cameras are well studied, practitioners still lack structured tools to support selection based on concrete application needs. This paper addresses the vision-system selection problem by introducing a conventional multi-criteria decision framework that compares frame-based and event-based cameras across both performance and deployment dimensions, utilizing the Weighted Sum Model (WSM), also known as Simple Additive Weighting (SAW). The framework evaluates systems using seven criteria: accuracy, processing time, power consumption, robustness to object speed, sensitivity to lighting changes, computational complexity, and deployability. We apply this model to a frame-based embedded module (OpenMV RT1062) and an event-based sensor (GENX320) under realistic industrial conditions with varying conveyor speeds and lighting levels. Real-time logs provide key performance indicators, including classification accuracy, processing time, and robustness measures. Using normalization and weighted scoring within the WSM/SAW approach, the framework ranks candidate systems for specific use cases and highlights trade-offs between performance and deployment factors. Experimental results show that the event-based system offers higher accuracy and robustness in dynamic and variable environments, while the frame-based system remains competitive in processing time under stable conditions. This work demonstrates how a well-established multi-criteria decision method can be applied to vision-system selection, giving engineers and researchers a quantitative, transparent basis for choosing between frame-based and event-based cameras in Industry 4.0 applications.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts4-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts4-4')">&times;</button>
+    <h3>Abstract — Tactile Knocker: Gaze Steering via Physical Stimuli for Safe Alerting in an Educational Workshop</h3>
+    <div class="abstract-texto"><p>In educational and instructional workshops within technical and engineering institutions, student trainees frequently experience high cognitive workloads as they focus intensely on learning complex manual assembly tasks. Under these demanding multitasking conditions, peripheral visual salience decreases dramatically, causing cognitive tunnel vision that leads to the critical omission of visual safety alerts and instructional cues. This paper proposes a wearable tactile gaze steering system designed to mitigate cognitive tunneling and enhance safety in such instructional environments. The system utilizes a 4-DOF wearable knocker device that delivers localized physical stimuli directly to the operator's shoulder, reliably triggering the human orienting reflex. Controlled via the Web Serial API with millisecond-level synchronization, the host PC coordinates tactile stimuli based on the assembly task sequence. An empirical evaluation involving 18 participants performing a high-density nut-assembly task demonstrated that the tactile alert system successfully reduced the alert omission rate from 14.4% under the conventional visual LED condition to 0.3%. Furthermore, the overall mean behavioral response time was significantly shortened from 1.77 seconds to 1.55 seconds, with successful target identifications (L3 trials) accelerating from 1.74 seconds to 1.50 seconds. These results demonstrate that bypassing visual-cognitive processing via tactile physical cues reliably redirects a trainee's attention, preventing critical alert omissions while simultaneously improving pedagogical efficiency and operational safety in educational workshop environments.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts4-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts4-5')">&times;</button>
+    <h3>Abstract — Robotic Pencil Drawing: Improving Shade Reproduction Through Optical Measurement</h3>
+    <div class="abstract-texto"><p>In previous work we introduced a robotic pencil-drawing system in which a genetic algorithm decomposes a reference image into line segments and an industrial robot reproduces them on paper using a spring-loaded graphite tool. Although the system was able to create detailed drawings, differences remained between the digitally generated image and the physical result because the algorithm represented overlapping strokes using a simplified digital blending mode. The present work continues this research by experimentally investigating how graphite behaves when multiple lines are combined on paper. Test patterns were produced by a robotic manipulator using systematically varied tool offsets and repeated stroke overlaps. The resulting graphite shades were measured with an industrial camera under controlled lighting conditions and analyzed to determine the relationships between tool offset, existing graphite coverage, number of layers, and final shade intensity. The aim of this work is to use these experimentally determined relationships to develop a more realistic graphite-blending model for the image-generation algorithm. By replacing the simplified digital blending process with a model derived from physical measurements, the proposed approach is intended to improve shade prediction, increase the precision of generated drawings, and reduce the difference between the simulated image and the final robotically produced artwork.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Mini TS6 ===== -->
+<div class="modal" id="mini-abs-ts6-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts6-1')">&times;</button>
+    <h3>Abstract — Preliminary Single-Subject Comparative Evaluation of sEMG Acquisition Systems for Hand Gesture Recognition in Neuroprosthetic Control</h3>
+    <div class="abstract-texto"><p>This paper presents the design, implementation, and preliminary functional verification of a proof-of-concept excavating rover platform developed as a terrestrial testbed for future lunar regolith collection and transportation research. The platform integrates a four-wheel differential-drive mobility system with additively manufactured grouser wheels, a conveyor-based excavation mechanism, a rear disposal bucket, an NVIDIA Jetson Orin NX, an ESP32 microcontroller, ROS 2, micro-ROS, LiDAR, and camera sensing. The architecture separates high-level computing from low-level actuation and intentionally avoids reliance on wheel-encoder odometry because severe slip is expected on loose granular terrain. A physical prototype was fabricated and integrated. Preliminary testing verified manual forward and reverse motion, turning, conveyor operation, disposal-bucket actuation, ROS 2 and micro-ROS communication, sensor integration, and wireless teleoperation. The prototype is not presented as a lunar-qualified rover: autonomous excavation, quantitative lunar-analog performance, and environmental qualification remain future work. Instead, the contribution is an integrated physical research platform that exposes practical system-level issues and provides a basis for controlled regolith-simulant testing and progressive development of autonomous navigation and excavation capabilities.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts6-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts6-2')">&times;</button>
+    <h3>Abstract — Software-in-the-Loop Validation of a Real-Time sEMG Control Pipeline for a Five-Finger Prosthetic Hand</h3>
+    <div class="abstract-texto"><p>This paper presents a software-in-the-loop (SIL) validation of a real-time surface electromyography (sEMG) command pipeline for a five-finger prosthetic hand, ahead of the mechanical and embedded realization of the physical device. A convolutional neural network (CNN), previously trained and evaluated offline on a ten-class single-subject hand-gesture dataset acquired with a wireless forearm armband, is embedded unchanged in a continuous real-time pipeline in which streamed signals are filtered, converted into log-power spectrograms identical to those used during training, classified, and temporally smoothed by five-prediction majority voting. The present study does not re-estimate classifier accuracy; instead, it validates the acquisition-to-command execution chain and reinterprets the prior offline confusion structure as a reliability map of the resulting finger commands. Predictions are refreshed every 50 ms, corresponding to a configured update rate of 20 Hz. For a sustained class transition, the five-sample voter changes its output on the third consistent new prediction, adding 100 ms relative to the first raw new-class prediction while rejecting isolated one- or two-sample label excursions. The recognized gesture is mapped onto a five-finger flexion state that drives the closed-form kinematics of a previously synthesized finger mechanism and a simulated actuation command. The present implementation is strictly feedforward: no physical prosthesis, force/tactile sensing, or sensory-feedback path is included.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts6-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts6-3')">&times;</button>
+    <h3>Abstract — HMI and Visualization Layers for Soft PLC-Oriented Industrial Control Systems: Requirements and a Node-RED Case Study</h3>
+    <div class="abstract-texto"><p>Soft PLC-based control systems represent a flexible approach to implementing industrial control logic on software-oriented, embedded and edge computing platforms. In addition to the execution of control algorithms, these systems require suitable human–machine interfaces and visualization layers that support process monitoring, operator interaction, diagnostics and supervisory functions. The selection of an appropriate HMI solution is therefore an important aspect of Soft PLC deployment, especially in distributed industrial, manufacturing and broader automation applications. This paper examines the main requirements for HMI and visualization layers in Soft PLC-oriented industrial control systems, including data presentation, manual control, alarm handling, trend visualization, remote access, communication with control devices, security, maintainability and scalability. Different implementation approaches are considered, ranging from conventional industrial HMI and SCADA systems to web-based dashboards and lightweight low-code platforms. Particular attention is given to Node-RED as a possible tool for implementing visualization and operator interfaces within open automation architectures. An implemented indoor environmental monitoring system is presented as an illustrative case study of a Node-RED-based communication, processing and visualization layer rather than as a complete Soft PLC implementation. Based on a qualitative, requirement-oriented discussion, the paper identifies the capabilities and limitations of this approach and outlines application scenarios in which lightweight Node-RED-based visualization may be appropriate, as well as cases where dedicated industrial HMI or SCADA platforms remain more suitable.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts6-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts6-4')">&times;</button>
+    <h3>Abstract — Hand–Eye Calibration as a Hierarchical Screw-Axis Procrustes Problem: Exact Compatibility, SVD, and Davenport Solvers</h3>
+    <div class="abstract-texto"><p>We formulate hand–eye calibration as the alignment of corresponding screw axes under the adjoint action of SE(3). For regular screw motions, the equation AiX = XBi is equivalent to matching the signed rotation angle and pitch and transporting the associated oriented axes. We characterize exact dual-vector alignment by a compatibility–uniqueness theorem based on dual Gram equality, orientation, and an appreciable basis, with the constructive solution X = AB⁻¹. For noisy data, we show explicitly that the squared dual bilinear form is degenerate on pure-dual residuals and therefore cannot measure the squared moment error. We consequently introduce a real-valued hierarchical Procrustes estimator: first minimize the directional residual on SO(3), then minimize the screw-moment residual in translation. The rotational stage is solved equivalently by a 3×3 SVD or a 4×4 Davenport eigenproblem, while the translational stage is a common linear least-squares system. We prove the equivalence of the complete two-stage solvers, distinguish repeated singular values from genuine non-observability, derive the relevant conditioning matrix and Davenport spectral gap, and discuss pure translations and the limiting axis-extraction cases near zero and π. Numerical experiments with axes extracted from rigid motions confirm exact recovery and the agreement of the two implementations.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts6-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts6-5')">&times;</button>
+    <h3>Abstract — Measurement-Aware Reinforcement Learning for UAV Downlink Resource Control under Communication Uncertainty</h3>
+    <div class="abstract-texto"><p>Unmanned aerial vehicles (UAVs) are increasingly deployed as agile aerial base stations, yet micro-level downlink resource control remains difficult because the controller relies on an estimated signal-to-interference-plus-noise ratio (SINR) and other communication quantities that are available only through finite-accuracy observations affected by measurement and estimation uncertainty. A Beta-Parameter Bounded Optimisation-enhanced Reward-Modulated Adaptive Learning controller, denoted BPBO-RMAL, is proposed for decentralised UAV downlink power and subchannel control. Its performance is assessed within a measurement-aware framework in which quality of service (QoS), reward, fairness, and aggregate fitness are treated as uncertainty-affected measurands rather than deterministic outputs. The controller is benchmarked against a Baseline RMAL policy and a Harris Hawks Optimisation-refined Q-learning policy (Q-learning+HHO) under a common seeded protocol, and the input uncertainties are propagated using the GUM law of propagation of uncertainty and a Monte-Carlo propagation of distributions. Across the common seeded evaluations, BPBO-RMAL achieved higher QoS and aggregate fitness than the benchmark controllers. A 1 dB SINR-estimation error induces about 21% QoS misclassification near the decision threshold, and under the evaluated simulation configuration and assigned uncertainty model, BPBO-RMAL attains the highest mean QoS and aggregate fitness among the compared controllers.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Mini TS8 ===== -->
+<div class="modal" id="mini-abs-ts8-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts8-1')">&times;</button>
+    <h3>Abstract — A Tactical CubeSat Architecture for LiDAR-Based Lunar Landing Risk Assessment</h3>
+    <div class="abstract-texto"><p>The renewed interest in lunar exploration, driven by Artemis and emerging commercial initiatives, introduces a critical operational challenge: high-value landing sites near the lunar South Pole are often located in permanently shadowed regions (PSRs), where passive sensing is ineffective and terrain risks remain unresolved. This paper proposes a tactical scouting architecture based on agile CubeSats equipped with LiDAR altimetry to support landing risk assessment under extreme illumination constraints. The concept introduces a "Diving Scout" maneuver, in which a 6U CubeSat temporarily lowers its perilune from a stable orbit to 3–10 km to achieve sub-meter terrain characterization. A simulation framework combining orbital dynamics, synthetic terrain modeling, and sensor physics demonstrates that the architecture can resolve meter-scale risks with sufficient sampling density for autonomous landing support. To address the data bottleneck inherent to high-rate LiDAR sensing, an onboard FPGA-based edge computing pipeline is proposed, transforming raw point clouds into decision-ready risk maps and reducing data volume by more than 99%. A constellation analysis further shows that three coordinated CubeSats reduce revisit gaps from ~114 minutes to ~35 minutes, enabling near-real-time situational awareness. The results indicate that distributed, agile CubeSats can bridge the gap between orbital reconnaissance and surface operations, providing a scalable and operationally viable solution for risk-aware lunar exploration.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts8-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts8-2')">&times;</button>
+    <h3>Abstract — Real-Time Evaluation of an Electric Vehicle Traction System Based on Indirect Field-Oriented Control on a Typhoon HIL Platform</h3>
+    <div class="abstract-texto"><p>This paper evaluates, in real time, an electric-vehicle traction model adapted from the Typhoon HIL Electric Vehicle application example and composed of a battery-fed voltage-source inverter, a three-phase induction motor, a fixed-ratio driveline, and one-degree-of-freedom longitudinal vehicle dynamics. The drive uses indirect field-oriented control (IFOC), with an outer speed loop, inner direct- and quadrature-axis current loops, and space-vector pulse-width modulation. The controller and plant model were executed on a Typhoon HIL402; no physical traction component or external electronic control unit was connected to the loop. The study therefore concerns controller-embedded real-time simulation on HIL hardware rather than vehicle-level experimental validation. The implementation was assessed through a high-speed reference transition, torque–speed and dc-source energy analyses, and a comparison with an offline PLECS model. The real-time run reached 243.8 km/h for a 250 km/h command, with a steady-state tracking error of 11.37 km/h and a peak electromagnetic torque of 768.4 N·m. Agreement between the offline and real-time results was evaluated separately for speed, torque, and phase-current magnitude, yielding MAPE values of 0.85%, 2.10%, and 8.59%, respectively. The remaining discrepancies are consistent with the different numerical settings, sampling paths, and time alignment used in the two environments. These results establish the implemented platform as an intermediate step for controller verification before connection to an external controller or a physical electric-vehicle powertrain.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts8-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts8-3')">&times;</button>
+    <h3>Abstract — Measurement-Driven Self-Healing LR2021 Mesh: ETX–Q-Score Comparison and Near-Margin Airborne-Relay Evaluation</h3>
+    <div class="abstract-texto"><p>Unmanned-aerial-vehicle-supported mesh communication networks can restore telemetry when obstacles, interference, or environmental geometry disrupt direct links. However, metrics based predominantly on packet delivery may provide limited resolution near the connectivity margin. This work implements, on a four-node Semtech LR2021 mesh, an active Q-score combining delivery, RSSI, and observed outage state and uses it directly as the route-selection cost in a Babel-derived core. The method is compared with expected transmission count (ETX) using the same hardware and a frame-synchronous access architecture. A controlled 10-session campaign lasting 379.7 min, with 103 programmed blackouts, achieved sequence-aware PDRs of 99.9274% for ETX and 99.8533% for Q in the matched healthy pair. All 431 ETX route records tied the candidate paths, whereas Q distinguished them in most observations. Blackout recognition remained similar between the arms (0.871 s for ETX and 0.868–0.901 s for Q) because both used the same liveness rule. In the complementary airborne-relay campaign, the closest baseline comparison produced LEAF-to-GCS PDRs of 40.77% for ETX and 38.34% for Q-AM. Within the −80 to −76 dBm range, the median ETX cost remained at its minimum value of 256, whereas the Q-score reached 359. These results demonstrate that Q was effectively integrated into route selection and provided finer near-margin resolution. However, sequential experimental arms, mobility, and variable relay availability preclude a causal conclusion that Q outperforms ETX.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts8-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts8-4')">&times;</button>
+    <h3>Abstract — Cascaded Model-Free Dynamic Compensation for Trajectory Tracking of Cooperative Mobile Robot Formations</h3>
+    <div class="abstract-texto"><p>This paper presents a Cascaded Model-Free intelligent Proportional–Integral–Derivative (iPID) control architecture (P-MF) for trajectory tracking in cooperative mobile robot formations operating under dynamic uncertainties. The proposed controller combines an outer-loop proportional kinematic controller with an inner-loop Model-Free iPID dynamic compensator, eliminating the need for an explicit robot dynamic model while preserving the conventional cascaded control structure. The inner controller estimates the unknown ultra-local dynamics online using only measured input–output data, enabling accurate velocity tracking despite parametric uncertainties and external disturbances. The proposed P-MF controller is evaluated on a triangular formation of differential-drive mobile robots and compared with both a conventional model-based proportional controller with inverse dynamic compensation (P-ID) and a Fully Model-Free task-space controller (MF). Simulation results demonstrate that the proposed cascaded architecture achieves the best overall performance in terms of trajectory tracking accuracy and control smoothness. The superior performance of the P-MF controller is attributed to performing Model-Free compensation directly on the robot velocity dynamics, which preserves the physical structure of the system and enables more accurate ultra-local estimation than applying Model-Free control directly to the coupled formation variables. These results demonstrate that Cascaded Model-Free compensation constitutes an effective and computationally efficient alternative to conventional model-based control for cooperative mobile robot formations operating under uncertain dynamic conditions.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts8-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts8-5')">&times;</button>
+    <h3>Abstract — An Error-Dependent Nonlinear Sliding Mode Controller for Robust Trajectory Tracking of an Aerial Manipulator</h3>
+    <div class="abstract-texto"><p>Robust trajectory tracking of aerial manipulators remains a challenging control problem due to the strong nonlinear coupling between the UAV and the robotic manipulator, as well as modeling uncertainties and external disturbances. This paper proposes a Sliding Mode Control with a Nonlinear error-dependent sliding surface for robust trajectory tracking of aerial manipulators based on their coupled kinematic and dynamic models. Unlike conventional sliding mode controllers, the proposed approach introduces a nonlinear sliding surface exclusively within the discontinuous control component, allowing the switching action to be modulated according to the tracking error while preserving the nominal continuous dynamics. Consequently, the controller enhances transient performance and attenuates chattering effects without requiring additional disturbance observers, adaptive laws, or intelligent approximators. The closed-loop stability of the proposed controller is established through Lyapunov theory, guaranteeing the asymptotic convergence of the tracking errors. Simulation results under complex three-dimensional reference trajectories demonstrate that the proposed SMC-NL controller consistently outperforms the ID, PID, and conventional SMC controllers by achieving the lowest ISE and IAE values, corresponding to improvements of up to 35.3% and 46.5%, respectively, while generating physically feasible control signals suitable for aerial manipulation. These results demonstrate that the proposed strategy provides an effective solution for robust trajectory tracking of aerial manipulators operating under uncertain conditions.</p></div>
+  </div>
+</div>
+<!-- ===== Modais dos abstracts — Mini TS10 ===== -->
+<div class="modal" id="mini-abs-ts10-1">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-1')">&times;</button>
+    <h3>Abstract — LiDAR Scout Rover: A Distributed ROS 2 Architecture for Robust Multi-Layer Autonomous Navigation</h3>
+    <div class="abstract-texto"><p>This paper presents a distributed ROS 2 architecture for real-time autonomous navigation on a compact LiDAR-based scout rover. The system partitions deterministic motor control, edge-level sensing, and computationally intensive autonomy across an Arduino Mega 2560, a Raspberry Pi 5, and an Intel NUC workstation. Point-LIO LiDAR-inertial odometry is integrated with Nav2, slam_toolbox map correction, and custom obstacle-processing pipelines. Three navigation configurations were evaluated on a physical rover, progressing from forward-limited perception to 360-degree obstacle awareness and finally to a map-corrected V3 architecture. Quantitative CPU measurements show that workstation utilization increased from approximately 33% in V1/V2 to 52.25% in V3, while Raspberry Pi 5 utilization remained between 20% and 22%; the Point-LIO mapping and camera workload averaged 25.71% and peaked at 63.52% on the Pi. The experiments also exposed localization instability associated with vibration coupling from the rotating LiDAR assembly into its integrated IMU. The results demonstrate the practical value and tradeoffs of distributed computation for resource-constrained autonomous rover systems, while identifying localization accuracy and end-to-end latency measurement as priorities for future instrumented evaluation.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts10-2">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-2')">&times;</button>
+    <h3>Abstract — Methodology for Ranking UGCVs for the Brazilian Armed Forces Based on a Hybrid Approach of the LOPCOW and OPARA Multicriteria Decision-Making Methods</h3>
+    <div class="abstract-texto"><p>The importance of Unmanned Ground Combat Vehicles (UGCVs) for any country is significant, as these platforms offer a range of benefits that can enhance a nation's defence and security capabilities. In this regard, the present work aims to rank uncrewed ground combat vehicles using Logarithmic Multicriteria Decision-Making methods. Percentage Change-driven Objective Weighting (LOPCOW) and Objective Pairwise Adjusted Ratio Analysis (OPARA), for the Brazilian Armed Forces, aimed at monitoring border areas and potential conflicts. Six vehicle models were pre-selected as alternatives, and eight comparison criteria were used. The modelling results indicated the Type-X vehicle as the most favourable alternative, as it demonstrated superior performance across four of the analysed criteria compared to the others: speed, payload capacity, remote control, and armour.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts10-3">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-3')">&times;</button>
+    <h3>Abstract — Impact of Velocity Observers on Friction Compensation and Energy Reconstruction in Motor-Side Sensed Haptic Interfaces</h3>
+    <div class="abstract-texto"><p>This paper demonstrates that the choice of state observer directly influences the energetic interpretation of dynamic compensation in differential haptic interfaces instrumented exclusively with motor-side sensing. Three causal velocity estimation strategies were evaluated experimentally: Finite Differences with Butterworth filtering, an Alpha-Beta-Gamma observer, and a Savitzky-Golay filter. To enable a systematic comparison, observer parameters were tuned through a multi-objective Pareto-based synthesis balancing bandwidth, phase delay, noise sensitivity, and low-velocity tracking. Equivalent friction models were then identified for each observer using constant-velocity bidirectional sweeps. Despite identical mechanical hardware and control architectures, the identified Stribeck parameters varied substantially. Real-time friction compensation experiments further showed that standard signal-quality metrics do not predict energetic consistency. Local estimation artifacts propagate nonlinearly through the friction model, producing discrepancies of up to 38.1% in accumulated energy under identical physical motions, particularly during velocity reversals. These results show that the velocity observer functions as an integral part of the energetic measurement chain rather than a pure signal-processing block, directly influencing the inferred dissipation dynamics and highlighting the necessity of energy consistent observer design for dynamic compensation.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts10-4">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-4')">&times;</button>
+    <h3>Abstract — Robust Impedance Control Synthesis within a Generalized Output Regulation Framework for a 1-DOF Mechanical System</h3>
+    <div class="abstract-texto"><p>This paper addresses the synthesis of robust impedance controllers for a 1-DOF mechanical system, which is important for safe physical human-robot interaction and versatile performance in general robotics, within a generalized output regulation framework. Building upon recently established results, including prior work co-authored by some of the authors, that demonstrate an equivalence between compliant control and output regulation, we consider a broader formulation of the impedance control problem in which impedance realization and disturbance attenuation are treated simultaneously. By exploiting the regulator equations to reformulate the impedance tracking objective as an output regulation problem, a control structure is derived that guarantees exact realization of a prescribed impedance behavior under nominal conditions. To enhance robustness against unmeasured disturbances, an H∞ synthesis procedure is introduced based on a bounded-real formulation, yielding a convex LMI condition for the computation of feedback gains that minimize the disturbance-to-impedance error transfer. The proposed approach unifies impedance control, generalized output regulation, and robust control synthesis in a single framework, providing both compliant behavior and quantified disturbance rejection guarantees. Simulation and experimental results on a hydraulic 1-DOF actuation setup illustrate the effectiveness of the proposed controller under varying environmental stiffness and demonstrate improved interaction performance when compared with conventional compliant control strategies for stiffer environments.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts10-5">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-5')">&times;</button>
+    <h3>Abstract — Characterization of Soft-Robot-Induced Variability in Ultrasonic Thickness Measurement</h3>
+    <div class="abstract-texto"><p>Robotic ultrasonic thickness measurement (UTM) has traditionally been demonstrated on rigid robotic platforms, where high positional accuracy and controlled contact conditions ensure deterministic measurements. Soft robotic systems, however, offer advantages for inspecting hard-to-reach industrial assets due to their lower weight, adaptability, and reduced deployment cost. Nevertheless, their intrinsic compliance may introduce measurement variability that remains insufficiently understood. This work presents an experimental protocol to characterize the variability induced by a soft robotic manipulator during UTM using two sensor technologies: electromagnetic acoustic transducer (EMAT) and piezoelectric transducer. Experiments were conducted on three carbon steel specimens comprising two coated pipes with diameters of 3 and 6 inches, exposed to a representative service environment, and a flat plate configured to reproduce conditions encountered in hard-to-access areas. The results demonstrate that the manipulator introduces low measurement variance while maintaining reliable thickness estimation across different dimensions and geometries. These findings indicate that soft robotic platforms can provide consistent ultrasonic inspection performance and represent a promising solution for non-destructive evaluation of difficult-to-access industrial assets.</p></div>
+  </div>
+</div>
+<div class="modal" id="mini-abs-ts10-6">
+  <div class="modal-conteudo">
+    <button class="fechar" onclick="fecharModal('mini-abs-ts10-6')">&times;</button>
+    <h3>Abstract — Quasi-Static Analysis and Experimental Validation of a Microspine Gripping System for a Quadruped Climbing Robot on Rough Concrete</h3>
+    <div class="abstract-texto"><p>The inspection of vertical concrete elements, such as walls, columns, façades, and bridge piers, often requires scaffolding, aerial work platforms, or manual access at height, which increases operating costs and exposes personnel to hazardous conditions. Climbing robots represent an alternative for accessing these types of surfaces; however, conventional adhesion mechanisms based on magnetism, vacuum, or gecko-inspired dry adhesives have limitations when confronted with the roughness, porosity, presence of dust, and geometric variability of concrete. This work presents the quasi-static analysis and qualitative experimental validation of a bioinspired microspine-based gripping system for a quadruped climbing robot intended for rough concrete surfaces. The system incorporates two microspine arrays per limb, a V-shaped geometry, and a passive adaptation mechanism to improve mechanical conformity with surface asperities. A quasi-static model is developed to estimate the load supported by each limb, the available adhesion force, the minimum number of microspines required, and the design torque under a tripod support condition. Numerical simulation results on the effects of the attack angle, the fraction of active microspines, and the total robot mass are also presented, together with a finite element structural analysis of the gripping module. Finally, experimental tests on rough concrete verify the mechanical anchoring principle and the system's ability to withstand external disturbances without significant loss of contact.</p></div>
+  </div>
+</div>
+<footer>
+  <p>© ISMCR 2026 — International Symposium on Measurement and Control in Robotics — <a href="https://www.ismcr.org">www.ismcr.org</a></p>
+</footer>
+<script>
+  // Abas dos auditórios
+  document.querySelectorAll('.aba').forEach(function(aba){
+    aba.addEventListener('click', function(){
+      document.querySelectorAll('.aba').forEach(function(b){b.classList.remove('ativa')});
+      document.querySelectorAll('.painel').forEach(function(p){p.classList.remove('ativa')});
+      aba.classList.add('ativa');
+      document.getElementById('painel-' + aba.getAttribute('data-aba')).classList.add('ativa');
+    });
+  });
+  // Modais
+  function abrirModal(id){document.getElementById(id).classList.add('aberta')}
+  function fecharModal(id){document.getElementById(id).classList.remove('aberta')}
+  document.querySelectorAll('.modal').forEach(function(m){
+    m.addEventListener('click', function(e){
+      if(e.target === m){m.classList.remove('aberta')}
+    });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.modal.aberta').forEach(function(m){m.classList.remove('aberta')});
+    }
+  });
+</script>
+</body>
+</html>
